@@ -8,6 +8,10 @@ const client = new steamClient({
 let _blocked = false; // globalizing playingState blocked variable
 
 // log in
+
+if (credentials.accountName.length <= 0)
+	throw Error("You can not use anonymous login!");
+
 client.logOn(credentials);
 
 client.on("loggedOn", _ => {
