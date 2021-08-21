@@ -1,0 +1,32 @@
+{
+	"name": "steam-hour-booster-node",
+	"version": "1.0.0",
+	"description": "Steam hour booster for games",
+	"main": "./src/index.js",
+	"scripts": {
+		"start": "node ./src/index.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/DrWarpMan/steam-hour-booster-node.git"
+	},
+	"keywords": [
+		"steam",
+		"hour",
+		"booster"
+	],
+	"author": "DrWarpMan",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/DrWarpMan/steam-hour-booster-node/issues"
+	},
+	"homepage": "https://github.com/DrWarpMan/steam-hour-booster-node#readme",
+	"devDependencies": {
+		"eslint": "^7.32.0",
+		"prettier": "2.3.2"
+	},
+	"dependencies": {
+		"steam-user": "^4.19.12"
+	},
+	"type": "module"
+}
