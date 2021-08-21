@@ -3,4 +3,4 @@ const credentials = {
 	password: "",
 };
 
-export default credentials;
+module.exports = credentials;

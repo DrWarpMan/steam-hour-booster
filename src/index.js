@@ -1,5 +1,5 @@
-import steamClient from "steam-user";
-import credentials from "./../login.js";
+const steamClient = require("steam-user");
+const credentials = require("./../login.js");
 
 const client = new steamClient({
 	autoRelogin: true,
