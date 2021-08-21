@@ -37,7 +37,8 @@ client.on("playingState", (blocked, playingApp) => {
 	// ignore this client (myself)
 	if (blocked === false && playingApp !== 0) return;
 
-	return blocked ? stopGames() : playGames();
+	if (blocked === true) stopGames();
+	else playGames();
 });
 
 function playGames() {
