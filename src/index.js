@@ -3,6 +3,7 @@ const credentials = require("./../login.js");
 
 const client = new steamClient({
 	autoRelogin: true,
+	dataDirectory: "./steam-data",
 });
 
 let _blocked = false; // globalizing playingState blocked variable
