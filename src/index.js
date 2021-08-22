@@ -1,58 +1,102 @@
 const steamClient = require("steam-user");
-const credentials = require("./../login.js");
+const accounts = require("./../login.js");
+const pDefer = require("p-defer");
 
-const client = new steamClient({
-	autoRelogin: true,
-	dataDirectory: "./steam-data",
-});
+const bots = [];
 
-let _blocked = false; // globalizing playingState blocked variable
+class Bot {
+	constructor(accountName, password, games = [730]) {
+		this.accountName = accountName;
+		this.password = password;
+		this.games = games;
+		this.blocked = false;
+		this.loginSuccessful = pDefer();
 
-// log in
+		if (this.accountName.length <= 0)
+			throw Error("You can not use anonymous login!");
 
-if (credentials.accountName.length <= 0)
-	throw Error("You can not use anonymous login!");
+		this.client = new steamClient({
+			dataDirectory: "./steam-data",
+		});
 
-client.logOn(credentials);
-
-client.on("loggedOn", _ => {
-	console.info("Login successful!");
-	client.setPersona(steamClient.EPersonaState.Online); // update status - online
-
-	setTimeout(() => {
-		if (_blocked === false) playGames();
-	}, 1000);
-});
-
-client.on("error", err => {
-	//console.log(err);
-
-	if (steamClient.EResult[err.eresult] === "LoggedInElsewhere") {
-		client.logOn(credentials);
-		console.warn("Someone else started playing, reconnecting..");
-		return;
+		this.events();
 	}
 
-	console.error(`Error: ${steamClient.EResult[err.eresult]}`);
-});
+	start() {
+		if (this.blocked === false) this.startPlaying();
+	}
 
-client.on("playingState", (blocked, playingApp) => {
-	_blocked = blocked; // globalizing blocked variable
+	async logIn() {
+		console.info(`[${this.accountName}] - Logging in..`);
 
-	// ignore this client (myself)
-	if (blocked === false && playingApp !== 0) return;
+		this.client.logOn({
+			accountName: this.accountName,
+			password: this.password,
+		});
 
-	if (blocked === true) stopGames();
-	else playGames();
-});
+		return this.loginSuccessful.promise;
+	}
 
-function playGames() {
-	const games = [730];
-	console.info("No one is playing. Starting games.");
-	return client.gamesPlayed(games);
+	events() {
+		this.client.on("loggedOn", ({ client_supplied_steamid: sid64 }) => {
+			console.info(`[${this.accountName}] (${sid64}) - login successful!`);
+
+			this.client.setPersona(steamClient.EPersonaState.Online); // update status - online
+			this.loginSuccessful.resolve();
+		});
+
+		this.client.on("error", err => {
+			//console.log(err);
+
+			if (steamClient.EResult[err.eresult] === "LoggedInElsewhere") {
+				this.logIn();
+				console.warn(
+					`[${this.accountName}] - Someone else started playing, reconnecting..`
+				);
+				return;
+			}
+
+			console.error(
+				`[${this.accountName}] - Error: ${steamClient.EResult[err.eresult]}`
+			);
+		});
+
+		this.client.on("playingState", (blocked, playingApp) => {
+			this.blocked = blocked; // globalizing blocked variable
+
+			// ignore this client (bot)
+			if (blocked === false && playingApp !== 0) return;
+
+			if (blocked === true) this.stopPlaying();
+			else this.startPlaying();
+		});
+
+		this.client.on("steamGuard", () => {
+			throw new Error("Steam Guard not supported.");
+		});
+	}
+
+	startPlaying() {
+		console.info(`[${this.accountName}] - No one is playing. Starting games.`);
+		return this.client.gamesPlayed(this.games);
+	}
+
+	stopPlaying() {
+		console.warn(
+			`[${this.accountName}] - Someone else is playing, quiting any games.`
+		);
+		return this.client.gamesPlayed([]);
+	}
 }
 
-function stopGames() {
-	console.warn("Someone else is playing, quiting any games.");
-	return client.gamesPlayed([]);
-}
+(async () => {
+	for (const { accountName, password } of accounts) {
+		const bot = new Bot(accountName, password);
+		await bot.logIn();
+		bots.push(bot);
+	}
+
+	setTimeout(() => {
+		for (const bot of bots) bot.start();
+	}, 1 * 1000);
+})();

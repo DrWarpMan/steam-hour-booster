@@ -1,6 +1,8 @@
-const credentials = {
-	accountName: "",
-	password: "",
-};
+const accounts = [
+	{
+		accountName: "",
+		password: "",
+	},
+];
 
-module.exports = credentials;
+module.exports = accounts;
