@@ -1,3 +1,7 @@
+steam-data/*
+!steam-data/.gitkeep
+login.js
+
 # Logs
 logs
 *.log
