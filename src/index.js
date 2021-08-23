@@ -12,6 +12,7 @@ class Bot {
 		this.games = games;
 		this.blocked = false;
 		this.loginSuccessful = pDefer();
+		this.forceLoginStart = false;
 
 		if (this.accountName.length <= 0)
 			throw Error("You can not use anonymous login!");
@@ -28,7 +29,7 @@ class Bot {
 	}
 
 	async logIn() {
-		console.info(`[${this.accountName}] - Logging in..`);
+		console.log(`[${this.accountName}] - Logging in..`);
 
 		this.client.logOn({
 			accountName: this.accountName,
@@ -40,9 +41,15 @@ class Bot {
 
 	events() {
 		this.client.on("loggedOn", ({ client_supplied_steamid: sid64 }) => {
-			console.info(`[${this.accountName}] (${sid64}) - login successful!`);
+			console.log(`[${this.accountName}] (${sid64}) - login successful!`);
 
 			this.client.setPersona(steamClient.EPersonaState.Online); // update status - online
+
+			if (this.forceLoginStart === true) {
+				this.forceLoginStart = false;
+				this.start();
+			}
+
 			this.loginSuccessful.resolve();
 		});
 
@@ -50,14 +57,16 @@ class Bot {
 			//console.log(err);
 
 			if (steamClient.EResult[err.eresult] === "LoggedInElsewhere") {
-				this.logIn();
-				console.warn(
+				console.log(
 					`[${this.accountName}] - Someone else started playing, reconnecting..`
 				);
+
+				this.forceLoginStart = true;
+				this.logIn();
 				return;
 			}
 
-			console.error(
+			console.log(
 				`[${this.accountName}] - Error: ${steamClient.EResult[err.eresult]}`
 			);
 		});
@@ -72,7 +81,7 @@ class Bot {
 			else this.startPlaying();
 		});
 
-		this.client.on("steamGuard", async (domain, callback) => {
+		this.client.on("steamGuard", async (_, callback) => {
 			const { code } = await prompts({
 				type: "text",
 				name: "code",
@@ -90,12 +99,12 @@ class Bot {
 	}
 
 	startPlaying() {
-		console.info(`[${this.accountName}] - No one is playing. Starting games.`);
+		console.log(`[${this.accountName}] - No one is playing. Starting games.`);
 		return this.client.gamesPlayed(this.games);
 	}
 
 	stopPlaying() {
-		console.warn(
+		console.log(
 			`[${this.accountName}] - Someone else is playing, quiting any games.`
 		);
 		return this.client.gamesPlayed([]);
