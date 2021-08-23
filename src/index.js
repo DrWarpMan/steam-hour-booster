@@ -1,6 +1,7 @@
 const steamClient = require("steam-user");
 const accounts = require("./../login.js");
 const pDefer = require("p-defer");
+const prompts = require("prompts");
 
 const bots = [];
 
@@ -71,9 +72,21 @@ class Bot {
 			else this.startPlaying();
 		});
 
+		this.client.on("steamGuard", async (domain, callback) => {
+			const { code } = await prompts({
+				type: "text",
+				name: "code",
+				message: `[${this.accountName}] - Please, type your Steam guard code:`,
+			});
+
+			callback(code);
+		});
+
+		/*
 		this.client.on("steamGuard", () => {
 			throw new Error("Steam Guard not supported.");
 		});
+		*/
 	}
 
 	startPlaying() {
