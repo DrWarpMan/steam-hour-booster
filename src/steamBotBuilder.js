@@ -1,8 +1,8 @@
-import steamClient from "steam-user";
-import prompts from "prompts";
-import { writeFileSync } from "fs";
+const steamClient = require("steam-user");
+const prompts = require("prompts");
+const fs = require("fs");
 
-export default (accounts, accountsFilePath) => {
+module.exports = (accounts, accountsFilePath) => {
 	class Bot {
 		constructor(accountName, password, games = [730], loginKey = "") {
 			this.accountName = accountName;
@@ -75,7 +75,7 @@ export default (accounts, accountsFilePath) => {
 
 			this.client.on("playingState", (blocked, playingApp) => {
 				console.log(
-					`[${this.accountName}] - Playing state: ${blocked} ${playingApp}`
+					`[${this.accountName}] - Playing state: blocked: ${blocked} app: ${playingApp}`
 				);
 
 				this.blocked = blocked; // globalizing blocked variable
@@ -100,7 +100,7 @@ export default (accounts, accountsFilePath) => {
 			this.client.on("loginKey", key => {
 				console.log(`[${this.accountName}] - Saving new login key: ${key}`);
 				accounts[this.accountName].loginKey = key;
-				writeFileSync(accountsFilePath, JSON.stringify(accounts, null, 4));
+				fs.writeFileSync(accountsFilePath, JSON.stringify(accounts, null, 4));
 			});
 		}
 
@@ -117,7 +117,7 @@ export default (accounts, accountsFilePath) => {
 		removeKey() {
 			this.loginKey = "";
 			delete accounts[this.accountName].loginKey;
-			writeFileSync(accountsFilePath, JSON.stringify(accounts, null, 4));
+			fs.writeFileSync(accountsFilePath, JSON.stringify(accounts, null, 4));
 		}
 	}
 

@@ -1,8 +1,8 @@
-import { readFileSync } from "fs";
-import steamBotBuilder from "./steamBotBuilder.js";
+const fs = require("fs");
+const steamBotBuilder = require("./steamBotBuilder.js");
 
-const accountsFilePath = new URL("./../login.json", import.meta.url);
-const accounts = JSON.parse(readFileSync(accountsFilePath));
+const accountsFilePath = __dirname + "./../login.json";
+const accounts = JSON.parse(fs.readFileSync(accountsFilePath));
 const steamBot = steamBotBuilder(accounts, accountsFilePath);
 
 Object.keys(accounts).forEach(accountName => {
