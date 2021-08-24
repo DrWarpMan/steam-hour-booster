@@ -26,7 +26,6 @@
 		"prettier": "2.3.2"
 	},
 	"dependencies": {
-		"p-defer": "^3.0.0",
 		"prompts": "^2.4.1",
 		"steam-user": "^4.19.12"
 	},
