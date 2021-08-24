@@ -56,3 +56,4 @@ node .
 ```
 
 I advise you to install PM2 and use it to run this node app in the background, for 24/7 on a machine, like a VPS.
+Note: First run the app through bash, via `npm start` or `node .` to input your Steam Guard code from your e-mail, then you can run the app through PM2.
