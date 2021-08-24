@@ -1,6 +1,6 @@
 steam-data/*
 !steam-data/.gitkeep
-login.js
+login.json
 
 # Logs
 logs

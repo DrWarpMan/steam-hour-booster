@@ -1,7 +1,11 @@
-import steamBot from "./steamBot.js";
-import accounts from "./../login.js";
+import { readFileSync } from "fs";
+import steamBotBuilder from "./steamBotBuilder.js";
 
-for (const { accountName, password } of accounts) {
-	const bot = new steamBot(accountName, password, [730]);
-	bot.logIn();
-}
+const accountsFilePath = new URL("./../login.json", import.meta.url);
+const accounts = JSON.parse(readFileSync(accountsFilePath));
+const steamBot = steamBotBuilder(accounts, accountsFilePath);
+
+Object.keys(accounts).forEach(accountName => {
+	const { password, games, loginKey } = accounts[accountName];
+	new steamBot(accountName, password, games, loginKey || "");
+});
