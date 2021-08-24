@@ -29,5 +29,5 @@
 		"prompts": "^2.4.1",
 		"steam-user": "^4.19.12"
 	},
-	"type": "commonjs"
+	"type": "module"
 }

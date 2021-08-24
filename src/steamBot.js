@@ -1,5 +1,5 @@
-const steamClient = require("steam-user");
-const prompts = require("prompts");
+import steamClient from "steam-user";
+import prompts from "prompts";
 
 class Bot {
 	constructor(accountName, password, games) {
@@ -82,4 +82,4 @@ class Bot {
 	}
 }
 
-module.exports = Bot;
+export default Bot;
