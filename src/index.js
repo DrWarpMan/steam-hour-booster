@@ -1,7 +1,7 @@
 const fs = require("fs");
 const steamBotBuilder = require("./steamBotBuilder.js");
 
-const accountsFilePath = __dirname + "/../login.json";
+const accountsFilePath = __dirname + "/../credentials/login.json";
 const accounts = JSON.parse(fs.readFileSync(accountsFilePath));
 const steamBot = steamBotBuilder(accounts, accountsFilePath);
 

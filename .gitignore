@@ -1,6 +1,6 @@
 steam-data/*
-!steam-data/.gitkeep
-login.json
+credentials/*
+!.gitkeep
 
 # Logs
 logs
