@@ -3,7 +3,7 @@
 
 FROM node:18-alpine
 
-WORKDIR /usr/src/
+WORKDIR /usr/src/booster
 
 COPY package*.json ./
 
