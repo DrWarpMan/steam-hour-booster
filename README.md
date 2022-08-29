@@ -6,6 +6,8 @@ Steam hour booster will increase your in-game playtime (hours) by using official
 You should run this on a VPS to make it effective.
 Does not fully support Steam Guard.
 
+(Docker version here: https://hub.docker.com/r/drwarpman/steam-hour-booster-node)
+
 ## Download & Installation
 
 Clone the repository:
