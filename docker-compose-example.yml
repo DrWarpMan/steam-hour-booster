@@ -1,0 +1,6 @@
+services:
+  booster:
+    image: drwarpman/steam-hour-booster-node
+    restart: always
+    volumes:
+      - ./login.js:/usr/src/booster/login.js
