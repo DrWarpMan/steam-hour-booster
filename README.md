@@ -1,7 +1,5 @@
 # steam-hour-booster-node
 
-Steam Hour Booster
-
 ## Information
 
 Steam hour booster will increase your in-game playtime (hours) by using official Steam API.
