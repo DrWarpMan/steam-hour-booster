@@ -2,8 +2,9 @@
 
 ## Information
 
-Steam Hour Booster will increase your in-game playtime using node.js "steam-user" library.
-You should run this on a 24/7 online server to make this effective.
+Steam Hour Booster will log in to your Steam account(s) and make you seem
+as if you were playing certain game(s) which results in increasing your Steam playtime for that specific game(s).
+(This way of boosting hours is not breaking any rules, thus it won't get your account banned.)
 
 - fully supports boosting accounts without Steam Guard
 - partial support for E-Mail Steam Guard
@@ -59,3 +60,6 @@ npm start
 
 If you use E-Mail Steam Guard, you need to run this app with console first, so that you can input your Steam Guard code,
 afterwards it saves the "session" and you don't need to worry about Steam Guard anymore. Steam Guard via Mobile is not supported!
+
+You should run this on a 24/7 online server to make this effective.
+To run it in the background, use either PM2 or docker version of this app.
