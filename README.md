@@ -2,11 +2,14 @@
 
 ## Information
 
-Steam Hour Booster will increase your in-game playtime by using official Steam Client API.
+Steam Hour Booster will increase your in-game playtime using node.js "steam-user" library.
 You should run this on a 24/7 online server to make this effective.
-(Supports only accounts without Steam Guard or with E-Mail Steam Guard)
 
-(Docker version here: https://hub.docker.com/r/drwarpman/steam-hour-booster)
+- fully supports boosting accounts without Steam Guard
+- partial support for E-Mail Steam Guard
+- no support for Mobile Steam Guard
+
+Docker version can be found here: https://hub.docker.com/r/drwarpman/steam-hour-booster
 
 ## Download & Installation
 
@@ -39,7 +42,7 @@ Example login.js file:
 const accounts = {
 	drwarpman: {
 		password: "SteamHourBooster123",
-		games: [730], // CS:GO
+		games: [730, 10], // CS:GO, CS 1.6
 	},
 };
 
@@ -54,5 +57,5 @@ You can have multiple accounts with each playing multiple games at once.
 npm start
 ```
 
-If you use Steam Guard, you need to run the app attached to it's console first, so that you can input your Steam Guard code,
-afterwards it saves the session and you don't need to worry about Steam Guard anymore.
+If you use E-Mail Steam Guard, you need to run this app with console first, so that you can input your Steam Guard code,
+afterwards it saves the "session" and you don't need to worry about Steam Guard anymore. Steam Guard via Mobile is not supported!
