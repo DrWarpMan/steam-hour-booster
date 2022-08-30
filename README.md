@@ -6,7 +6,10 @@ Increase the hours played on your Steam games
 
 Steam Hour Booster will log in to your Steam account(s) and make you seem
 as if you were playing certain game(s) which results in increasing your Steam playtime for that specific game(s).
-(This way of boosting hours is not breaking any rules, thus it won't get your account banned.)
+
+> Note: This way of boosting hours is not breaking any rules, thus it won't get your account banned.
+
+### Steam Guard
 
 - fully supports boosting accounts without Steam Guard
 - partial support for E-Mail Steam Guard
