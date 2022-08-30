@@ -65,12 +65,12 @@ class Bot {
 
 		// TODO: find a way to not get kicked out of a session
 		this.client.on("playingState", (blocked, appID) => {
-			this.log(`Playing status changed - [Blocked: ${blocked}, App: ${appID}]`);
-
 			this.blocked = blocked;
 
-			// Ignore if playing state was changed, because this bot is already playing
+			// Ignore if playing state was changed by this bot
 			if (blocked === false && appID !== 0) return;
+
+			this.log(`Playing status changed - [Blocked: ${blocked}, App: ${appID}]`);
 
 			if (blocked === true) {
 				this.stopGames();
