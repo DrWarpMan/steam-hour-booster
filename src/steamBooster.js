@@ -102,12 +102,6 @@ class Bot {
 		this.isBotPlaying = false;
 	}
 
-	removeKey() {
-		this.loginKey = "";
-		delete accounts[this.username].loginKey;
-		fs.writeFileSync(accountsFilePath, JSON.stringify(accounts, null, 4));
-	}
-
 	log(message, isError = false) {
 		if (!Bot.logEnabled) return;
 		message = `Account: ${this.username} - ${message}`;
