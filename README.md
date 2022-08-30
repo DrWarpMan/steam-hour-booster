@@ -36,12 +36,14 @@ and configure to your needs!
 Example login.js file:
 
 ```js
-{
-	"drwarpman": {
-		"password": "AppleJuice123",
-		"games": [730]
-	}
-}
+const accounts = {
+	drwarpman: {
+		password: "SteamHourBooster123",
+		games: [730], // CS:GO
+	},
+};
+
+export default accounts;
 ```
 
 You can have multiple accounts with each playing multiple games at once.
