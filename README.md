@@ -1,20 +1,20 @@
-# steam-hour-booster-node
+# steam-hour-booster
 
 ## Information
 
-Steam hour booster will increase your in-game playtime (hours) by using official Steam API.
-You should run this on a VPS to make it effective.
-Does not fully support Steam Guard.
+Steam Hour Booster will increase your in-game playtime by using official Steam Client API.
+You should run this on a 24/7 online server to make this effective.
+(Supports only accounts without Steam Guard or with E-Mail Steam Guard)
 
-(Docker version here: https://hub.docker.com/r/drwarpman/steam-hour-booster-node)
+(Docker version here: https://hub.docker.com/r/drwarpman/steam-hour-booster)
 
 ## Download & Installation
 
 Clone the repository:
 
 ```bash
-git clone https://github.com/DrWarpMan/steam-hour-booster-node.git
-cd steam-hour-booster-node
+git clone https://github.com/DrWarpMan/steam-hour-booster.git
+cd steam-hour-booster
 ```
 
 then install the packages:
@@ -25,35 +25,32 @@ npm install
 
 ## Configure
 
-Copy the default config:
+Copy the default configuration:
 
 ```bash
-cp login-default.json login.json
+cp ./login.default.js ./credentials/login.js
 ```
 
-and edit it to your needs afterwards.
+and configure to your needs!
 
-Example login.json file:
-```json
+Example login.js file:
+
+```js
 {
 	"drwarpman": {
-		"password": "mypasswordsteam",
+		"password": "AppleJuice123",
 		"games": [730]
 	}
 }
 ```
-730 is a CS:GO app ID.
-You can have multiple accounts in the config file.
+
+You can have multiple accounts with each playing multiple games at once.
 
 ## Run
 
 ```bash
 npm start
 ```
-or
-```bash
-node .
-```
 
-I advise you to install PM2 and use it to run this node app in the background, for 24/7 on a machine, like a VPS.
-Note: First run the app through bash, via `npm start` or `node .` to input your Steam Guard code from your e-mail, then you can run the app through PM2.
+If you use Steam Guard, you need to run the app attached to it's console first, so that you can input your Steam Guard code,
+afterwards it saves the session and you don't need to worry about Steam Guard anymore.

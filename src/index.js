@@ -1,11 +1,7 @@
-const fs = require("fs");
-const steamBotBuilder = require("./steamBotBuilder.js");
+import accounts from "../credentials/login.js";
+import steamBooster from "./steamBooster.js";
 
-const accountsFilePath = "./credentials/login.json";
-const accounts = JSON.parse(fs.readFileSync(accountsFilePath));
-const steamBot = steamBotBuilder(accounts, accountsFilePath);
-
-Object.keys(accounts).forEach(accountName => {
-	const { password, games, loginKey } = accounts[accountName];
-	new steamBot(accountName, password, games, loginKey || "");
-});
+for (const username in accounts) {
+	const { password, games } = accounts[username];
+	new steamBooster(username, password, games);
+}
