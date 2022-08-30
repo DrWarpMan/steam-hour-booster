@@ -1,5 +1,7 @@
 # steam-hour-booster
 
+Increase the hours played on your Steam games
+
 ## Information
 
 Steam Hour Booster will log in to your Steam account(s) and make you seem
