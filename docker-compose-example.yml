@@ -3,5 +3,5 @@ services:
     image: drwarpman/steam-hour-booster
     restart: always
     volumes:
-      - ./credentials/:/usr/src/booster/credentials/
-      #- ./steam-data/:/usr/src/booster/steam-data/
+      - ./booster/credentials/:/usr/src/booster/credentials/
+      - ./booster/steam-data/:/usr/src/booster/steam-data/
