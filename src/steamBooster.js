@@ -1,5 +1,5 @@
-import steamClient from "steam-user";
-import { createInterface } from "readline";
+import SteamClient from "steam-user";
+import { createInterface } from "readline-sync";
 
 class Bot {
 	static logEnabled = true;
@@ -14,7 +14,7 @@ class Bot {
 		if (this.username.length <= 0)
 			throw Error("You can not use anonymous login!");
 
-		this.client = new steamClient({ dataDirectory: "./steam-data" });
+		this.client = new SteamClient({ dataDirectory: "./steam-data" });
 
 		this.listenForEvents();
 		this.logIn();
