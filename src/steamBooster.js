@@ -10,7 +10,6 @@ class Bot {
 		this.games = games;
 		this.blocked = false;
 		this.isBotPlaying = false;
-		this.loggedIn = false;
 
 		if (this.username.length <= 0)
 			throw Error("You can not use anonymous login!");
