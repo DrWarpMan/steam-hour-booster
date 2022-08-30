@@ -1,5 +1,5 @@
 import SteamClient from "steam-user";
-import { createInterface } from "readline-sync";
+import { createInterface } from "readline";
 
 class Bot {
 	static logEnabled = true;
@@ -9,68 +9,21 @@ class Bot {
 		this.password = password;
 		this.games = games;
 		this.blocked = false;
+		this.sid64 = "";
 		this.isBotPlaying = false;
 
-		if (this.username.length <= 0)
-			throw Error("You can not use anonymous login!");
+		if (this.username.trim().length <= 0) throw new Error("You can not use anonymous login!");
+		if (this.password.length <= 0) throw new Error("Password is empty.");
+		if (this.games.length <= 0) throw new Error("Games to boost were not specified.");
 
 		this.client = new SteamClient({ dataDirectory: "./steam-data" });
 
-		this.listenForEvents();
-		this.logIn();
-	}
-
-	logIn() {
-		this.log(`Logging in..`);
-
-		const credentials = {
-			accountName: this.username,
-			password: this.password,
-		};
-
-		this.client.logOn(credentials);
-	}
-
-	listenForEvents() {
-		this.client.on("loggedOn", () => {
-			this.log("Login successful!");
-
-			this.client.setPersona(steamClient.EPersonaState.Online);
-
-			//setTimeout(() => {
-			//if (this.blocked === false) this.startGames();
-			//}, 3 * 1000);
-		});
-
-		this.client.on("steamGuard", (_, callback) => {
-			this.log("Steam is going to ask you for Steam Guard code.");
-
-			const rl = createInterface({
-				input: process.stdin,
-				output: process.stdout,
-			});
-
-			rl.question(
-				`Type Steam Guard code for account [${this.username}] now: `,
-				code => {
-					callback(code);
-					rl.close();
-				}
-			);
-		});
-
-		//this.client.on("loginKey", key => {
-		//	this.log(`Saving new authentication key: ${key}`);
-		//});
-
-		// TODO: find a way to not get kicked out of a session
 		this.client.on("playingState", (blocked, appID) => {
 			this.blocked = blocked;
 
 			// Ignore if playing state was changed by this bot
 			if (blocked === false && appID !== 0) return;
-
-			this.log(`Playing status changed - [Blocked: ${blocked}, App: ${appID}]`);
+			this.log(`Playing state updated - [Blocked: ${blocked}, App: ${appID}]`);
 
 			if (blocked === true) {
 				this.stopGames();
@@ -79,25 +32,107 @@ class Bot {
 			}
 		});
 
-		this.client.on("error", err => {
-			this.log(`Error: ${steamClient.EResult[err.eresult]}`);
+		this.boosterErrorListener = async err => {
+			if (SteamClient.EResult[err.eresult] === "LoggedInElsewhere") {
+				this.log("Someone else is playing, I need to re-login..");
+				this.client.removeListener("error", this.boosterErrorListener); // reset error listener
+				await this.login();
+				this.boost();
+			} else {
+				this.log(`Error: ${SteamClient.EResult[err.eresult]}`);
+				console.log(err);
+			}
+		};
+	}
 
-			//if (steamClient.EResult[err.eresult] === "InvalidPassword")
+	login() {
+		// todo, steam guard mobile
+		return new Promise((resolve, reject) => {
+			const credentials = {
+				accountName: this.username,
+				password: this.password,
+			};
+
+			const listeners = {
+				loggedOn: ({ client_supplied_steamid: sid64 }) => {
+					unlisten();
+
+					this.log("Login successful!");
+					this.sid64 = sid64;
+					this.client.setPersona(SteamClient.EPersonaState.Online);
+
+					resolve();
+				},
+				error: err => {
+					unlisten();
+
+					this.log(`Login failed - ${SteamClient.EResult[err.eresult]}`, true);
+
+					reject(new Error("Steam Error"));
+				},
+				steamGuard: (_, callback) => {
+					this.log("Steam is asking for Steam Guard code.");
+
+					const rl = createInterface({
+						input: process.stdin,
+						output: process.stdout,
+					});
+
+					rl.question(`Steam Guard Code for [${this.username}]: `, code => {
+						callback(code);
+						rl.close();
+					});
+				},
+			};
+
+			const listen = () => {
+				for (const listenerName in listeners)
+					this.client.once(listenerName, listeners[listenerName]);
+			};
+
+			const unlisten = () => {
+				for (const listenerName in listeners)
+					this.client.off(listenerName, listeners[listenerName]);
+			};
+
+			this.log(`Logging in..`);
+
+			listen();
+			this.client.logOn(credentials);
 		});
 	}
 
+	boost() {
+		this.client.on("error", this.boosterErrorListener);
+
+		/* i didnt find a situation where we would need this listener yet,
+		once it's found, we will implement this listener
+		
+		this.client.on("disconnected", (eresult, msg) => {
+			console.log(eresult, msg);
+			console.log(SteamClient.EResult[eresult]);
+		});
+		
+		// ? this.client.logOff();
+		*/
+
+		setTimeout(() => {
+			if (this.blocked === false) this.startGames();
+		}, 3 * 1000);
+	}
+
 	startGames() {
+		if (this.isBotPlaying) return;
+
 		this.log(`Starting games [${this.games.join(",")}]`);
-
-		if (this.isBotPlaying)
-			return this.log("Can't start games, bot is already playing.");
-
 		this.client.gamesPlayed(this.games);
 		this.isBotPlaying = true;
 	}
 
 	stopGames() {
-		this.log(`Stopping games [${this.games.join(",")}]`);
+		if (!this.isBotPlaying) return;
+
+		this.log(`Stopping games`);
 		this.client.gamesPlayed([]);
 		this.isBotPlaying = false;
 	}
