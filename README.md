@@ -13,7 +13,7 @@ as if you were playing certain game(s) which results in increasing your Steam pl
 
 - fully supports boosting accounts without Steam Guard
 - partial support for E-Mail Steam Guard
-- no support for Mobile Steam Guard
+- no support for Mobile Steam Guard (it's in my todo list)
 
 ### Docker
 
