@@ -2,7 +2,7 @@ services:
   booster:
     image: drwarpman/steam-hour-booster
     container_name: steam-hour-booster
-    restart: always
+    restart: unless-stopped
     volumes:
       - ./booster/credentials/:/usr/src/booster/credentials/
       - ./booster/steam-data/:/usr/src/booster/steam-data/

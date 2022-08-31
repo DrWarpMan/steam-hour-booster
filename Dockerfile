@@ -3,13 +3,11 @@
 
 FROM node:18-alpine
 
-ENV NODE_ENV production
-
 WORKDIR /usr/src/booster
 
 COPY package*.json ./
 
-RUN npm ci
+RUN npm ci --omit=dev
 
 COPY . .
 
