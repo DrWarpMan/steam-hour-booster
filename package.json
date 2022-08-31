@@ -2,31 +2,31 @@
 	"name": "steam-hour-booster",
 	"version": "2.0.0",
 	"description": "Steam Hour Booster",
+	"author": "DrWarpMan",
+	"license": "MIT",
+	"type": "module",
 	"main": "./src/index.js",
 	"scripts": {
-		"start": "node ./src/index.js"
+		"start": "node ."
 	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/DrWarpMan/steam-hour-booster.git"
 	},
+	"bugs": {
+		"url": "https://github.com/DrWarpMan/steam-hour-booster/issues"
+	},
+	"homepage": "https://github.com/DrWarpMan/steam-hour-booster#readme",
 	"keywords": [
 		"steam",
 		"hour",
 		"booster"
 	],
-	"author": "DrWarpMan",
-	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/DrWarpMan/steam-hour-booster/issues"
-	},
-	"homepage": "https://github.com/DrWarpMan/steam-hour-booster#readme",
-	"devDependencies": {
-		"eslint": "^7.32.0",
-		"prettier": "2.3.2"
-	},
 	"dependencies": {
 		"steam-user": "^4.24.6"
 	},
-	"type": "module"
+	"devDependencies": {
+		"eslint": "^7.32.0",
+		"prettier": "2.3.2"
+	}
 }
