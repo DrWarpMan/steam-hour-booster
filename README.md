@@ -65,8 +65,8 @@ You can have multiple accounts with each playing multiple games at once.
 npm start
 ```
 
-If you use E-Mail Steam Guard, you need to run this app with console first, so that you can input your Steam Guard code,
-afterwards it saves the "session" and you don't need to worry about Steam Guard anymore. Steam Guard via Mobile is not supported!
+If you use E-Mail Steam Guard, you need to run this app attached to it's console first, so that you can input your Steam Guard code,
+afterwards it saves the "session" and you don't need to worry about Steam Guard anymore. Steam Guard via Mobile is not supported, yet!
 
 You should run this on a 24/7 online server to make this effective.
 To run it in the background, use either PM2 or docker version of this app.
