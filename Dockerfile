@@ -7,7 +7,7 @@ WORKDIR /usr/src/booster
 
 COPY package*.json ./
 
-RUN npm ci --omit=dev
+RUN npm ci --production
 
 COPY . .
 
