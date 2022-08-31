@@ -8,7 +8,7 @@ class Bot {
 		this.username = username;
 		this.password = password;
 		this.games = games;
-		this.blocked = false;
+		this.blocked = true;
 		this.sid64 = "";
 		this.isBotPlaying = false;
 
@@ -23,26 +23,11 @@ class Bot {
 
 			// Ignore if playing state was changed by this bot
 			if (blocked === false && appID !== 0) return;
+
 			this.log(`Playing state updated - [Blocked: ${blocked}, App: ${appID}]`);
 
-			if (blocked === true) {
-				this.stopGames();
-			} else {
-				this.startGames();
-			}
+			this.updateGames();
 		});
-
-		this.boosterErrorListener = async err => {
-			if (SteamClient.EResult[err.eresult] === "LoggedInElsewhere") {
-				this.log("Someone else is playing, I need to re-login..");
-				this.client.removeListener("error", this.boosterErrorListener); // reset error listener
-				await this.login();
-				this.boost();
-			} else {
-				this.log(`Error: ${SteamClient.EResult[err.eresult]}`);
-				console.log(err);
-			}
-		};
 	}
 
 	login() {
@@ -103,7 +88,21 @@ class Bot {
 	}
 
 	boost() {
-		this.client.on("error", this.boosterErrorListener);
+		this.updateGames();
+
+		const errorListener = async err => {
+			if (SteamClient.EResult[err.eresult] === "LoggedInElsewhere") {
+				this.log("Someone else is playing, I need to re-login..");
+				this.client.removeListener("error", errorListener);
+				await this.login();
+				this.boost();
+			} else {
+				this.log(`Error: ${SteamClient.EResult[err.eresult]}`);
+				console.log(err);
+			}
+		};
+
+		this.client.on("error", errorListener);
 
 		/* i didnt find a situation where we would need this listener yet,
 		once it's found, we will implement this listener
@@ -115,10 +114,10 @@ class Bot {
 		
 		// ? this.client.logOff();
 		*/
+	}
 
-		setTimeout(() => {
-			if (this.blocked === false) this.startGames();
-		}, 3 * 1000);
+	updateGames() {
+		this.blocked === true ? this.stopGames() : this.startGames();
 	}
 
 	startGames() {
