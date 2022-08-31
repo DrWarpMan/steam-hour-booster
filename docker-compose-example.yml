@@ -1,7 +1,10 @@
 services:
   booster:
     image: drwarpman/steam-hour-booster
+    container_name: steam-hour-booster
     restart: always
     volumes:
       - ./booster/credentials/:/usr/src/booster/credentials/
       - ./booster/steam-data/:/usr/src/booster/steam-data/
+    stdin_open: true # docker run -i
+    tty: true # docker run -t
