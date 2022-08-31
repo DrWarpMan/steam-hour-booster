@@ -1,6 +1,6 @@
 # steam-hour-booster
 
-Increase the hours played on your Steam games
+Boosts your Steam games playtime
 
 ## Information
 
