@@ -1,6 +1,6 @@
 {
 	"name": "steam-hour-booster",
-	"version": "2.0.0",
+	"version": "2.1.0",
 	"description": "Steam Hour Booster",
 	"author": "DrWarpMan",
 	"license": "MIT",
@@ -23,6 +23,7 @@
 		"booster"
 	],
 	"dependencies": {
+		"file-system-cache": "^2.0.0",
 		"steam-user": "^4.24.6"
 	},
 	"devDependencies": {

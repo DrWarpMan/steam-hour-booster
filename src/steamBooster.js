@@ -1,7 +1,14 @@
 import SteamClient from "steam-user";
-import { createInterface } from "readline";
+import { FileSystemCache } from "file-system-cache";
+
+const STEAM_DATA_PATH = "./steam-data";
 
 class Bot {
+	static KEY_CACHE = new FileSystemCache({
+		basePath: `${STEAM_DATA_PATH}/login-keys`,
+		ns: "keys",
+	});
+
 	static logEnabled = true;
 
 	constructor(username, password, games) {
@@ -16,7 +23,7 @@ class Bot {
 		if (this.password.length <= 0) throw new Error("Password is empty.");
 		if (this.games.length <= 0) throw new Error("Games to boost were not specified.");
 
-		this.client = new SteamClient({ dataDirectory: "./steam-data" });
+		this.client = new SteamClient({ dataDirectory: STEAM_DATA_PATH });
 
 		this.client.on("playingState", (blocked, appID) => {
 			this.blocked = blocked;
@@ -28,15 +35,24 @@ class Bot {
 
 			this.updateGames();
 		});
+
+		this.client.on("loginKey", key => Bot.KEY_CACHE.set(this.username, key));
 	}
 
 	login() {
-		// todo, steam guard mobile
 		return new Promise((resolve, reject) => {
 			const credentials = {
 				accountName: this.username,
-				password: this.password,
+				rememberPassword: true,
 			};
+
+			const loginKey = Bot.KEY_CACHE.getSync(this.username, "");
+
+			if (loginKey === "") {
+				credentials.password = this.password;
+			} else {
+				credentials.loginKey = loginKey;
+			}
 
 			const listeners = {
 				loggedOn: ({ client_supplied_steamid: sid64 }) => {
@@ -46,27 +62,21 @@ class Bot {
 					this.sid64 = sid64;
 					this.client.setPersona(SteamClient.EPersonaState.Online);
 
-					resolve();
+					this.checkErrors();
+
+					resolve(sid64);
 				},
 				error: err => {
 					unlisten();
 
-					this.log(`Login failed - ${SteamClient.EResult[err.eresult]}`, true);
-
-					reject(new Error("Steam Error"));
-				},
-				steamGuard: (_, callback) => {
-					this.log("Steam is asking for Steam Guard code.");
-
-					const rl = createInterface({
-						input: process.stdin,
-						output: process.stdout,
-					});
-
-					rl.question(`Steam Guard Code for [${this.username}]: `, code => {
-						callback(code);
-						rl.close();
-					});
+					if (loginKey !== "" && SteamClient.EResult[err.eresult] === "InvalidPassword") {
+						this.log(`Login key expired, trying again with password instead.`, true);
+						Bot.KEY_CACHE.setSync(this.username, "");
+						resolve(this.login());
+					} else {
+						this.log(`Login failed - ${SteamClient.EResult[err.eresult]}`, true);
+						reject(new Error("Steam Error"));
+					}
 				},
 			};
 
@@ -87,16 +97,15 @@ class Bot {
 		});
 	}
 
-	boost() {
-		this.updateGames();
-
+	checkErrors() {
 		const errorListener = async err => {
+			/* relogin, if kicked out of session */
 			if (SteamClient.EResult[err.eresult] === "LoggedInElsewhere") {
 				this.log("Someone else is playing, I need to re-login..");
 				this.client.removeListener("error", errorListener);
 				await this.login();
-				this.boost();
-			} else {
+				this.updateGames();
+			} /* just crash if any other error occurs */ else {
 				this.log(`Error: ${SteamClient.EResult[err.eresult]}`);
 				console.log(err);
 			}

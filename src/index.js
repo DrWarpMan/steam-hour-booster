@@ -1,15 +1,15 @@
 import accounts from "../credentials/login.js";
-import steamBooster from "./steamBooster.js";
+import SteamBooster from "./steamBooster.js";
 
 console.log("Starting booster!");
 
 for (const username in accounts) {
 	const { password, games } = accounts[username];
-	const booster = new steamBooster(username, password, games);
+	const booster = new SteamBooster(username, password, games);
 
 	try {
 		await booster.login();
-		booster.boost();
+		booster.updateGames();
 	} catch (err) {
 		booster.log(`Couldn't start booster for this account, reason: ${err.message}`, true);
 	}
