@@ -11,9 +11,7 @@ as if you were playing certain game(s) which results in increasing your Steam pl
 
 ### Steam Guard
 
-- fully supports boosting accounts without Steam Guard
-- partial support for E-Mail Steam Guard
-- no support for Mobile Steam Guard (it's in my todo list)
+- fully supports boosting accounts with or without Steam Guard (both e-mail & phone app)
 
 ### Docker
 
@@ -65,8 +63,8 @@ You can have multiple accounts with each playing multiple games at once.
 npm start
 ```
 
-If you use E-Mail Steam Guard, you need to run this app attached to it's console first, so that you can input your Steam Guard code,
-afterwards it saves the "session" and you don't need to worry about Steam Guard anymore. Steam Guard via Mobile is not supported, yet!
+If you use Steam Guard, you need to run this app attached to it's console first, so that you can input your Steam Guard code,
+afterwards it saves the "session" and you don't need to worry about Steam Guard anymore.
 
 You should run this on a 24/7 online server to make this effective.
 To run it in the background, use either PM2 or docker version of this app.
