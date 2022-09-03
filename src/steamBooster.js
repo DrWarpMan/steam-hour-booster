@@ -67,6 +67,8 @@ class Bot {
 					this.sid64 = sid64;
 					this.client.setPersona(SteamClient.EPersonaState.Online);
 
+					this.log(`Link to profile: http://steamcommunity.com/profiles/${this.sid64}`);
+
 					this.checkErrors();
 
 					resolve(sid64);
