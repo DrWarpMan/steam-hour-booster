@@ -36,6 +36,11 @@ class Bot {
 			this.updateGames();
 		});
 
+		this.client.on("disconnected", (eresult, msg) => {
+			console.log(eresult, msg);
+			console.log(SteamClient.EResult[eresult]);
+		});
+
 		this.client.on("loginKey", key => Bot.KEY_CACHE.set(this.username, key));
 	}
 
@@ -111,18 +116,14 @@ class Bot {
 			}
 		};
 
-		this.client.on("error", errorListener);
-
-		/* i didnt find a situation where we would need this listener yet,
-		once it's found, we will implement this listener
-		
-		this.client.on("disconnected", (eresult, msg) => {
+		/*
+		const disconnectListener = (eresult, msg) => {
 			console.log(eresult, msg);
 			console.log(SteamClient.EResult[eresult]);
-		});
+		};
 		
-		// ? this.client.logOff();
-		*/
+		this.client.on("disconnected", disconnectListener);*/
+		this.client.on("error", errorListener);
 	}
 
 	updateGames() {
