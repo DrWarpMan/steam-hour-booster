@@ -6,7 +6,10 @@
 	"license": "MIT",
 	"type": "module",
 	"scripts": {
-		"start": "tsc && node ./dist/index.js"
+		"serve": "node dist/index.js",
+		"build": "tsc",
+		"start": "npm run build && npm run serve",
+		"watch": "tsc --watch"
 	},
 	"repository": {
 		"type": "git",
