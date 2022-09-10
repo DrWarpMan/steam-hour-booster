@@ -3,7 +3,7 @@
 node_modules
 
 steam-data/*
-credentials/*
+config/*
 !.gitkeep
 
 logs

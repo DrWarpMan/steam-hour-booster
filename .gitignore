@@ -1,5 +1,5 @@
 steam-data/*
-credentials/*
+config/*
 !.gitkeep
 
 # Logs

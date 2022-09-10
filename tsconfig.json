@@ -1,0 +1,13 @@
+{
+	"extends": "@tsconfig/node18-strictest-esm/tsconfig.json", // https://raw.githubusercontent.com/tsconfig/bases/main/bases/node18-strictest-esm.combined.json
+	"compilerOptions": {
+		"resolveJsonModule": true,
+		"outDir": "./dist",
+		"baseUrl": ".",
+		"paths": {
+			"*": ["node_modules/*", "src/types/*"]
+		}
+	},
+	"exclude": ["node_modules"],
+	"include": ["./src/**/*"]
+}
