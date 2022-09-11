@@ -1,9 +1,10 @@
 import SteamClient from "steam-user";
 import { FileSystemCache } from "file-system-cache";
+import { resolve } from "path";
 
-const STEAM_DATA_PATH = "./steam-data";
+const STEAM_DATA_PATH = resolve("steam-data");
 const KEYS_CACHE = new FileSystemCache({
-	basePath: `${STEAM_DATA_PATH}/login-keys`,
+	basePath: resolve(STEAM_DATA_PATH, "login-keys/"),
 	ns: "keys",
 });
 
@@ -87,7 +88,7 @@ class SteamBooster {
 				error: async (error: any) => {
 					this.client.removeListener("loggedOn", listeners["loggedOn"]);
 
-					if (loginKey === undefined && error.eresult === SteamClient.EResult.InvalidPassword) {
+					if (loginKey && error.eresult === SteamClient.EResult.InvalidPassword) {
 						this.log(`Login key expired, trying again with password instead.`, true);
 						KEYS_CACHE.setSync(this.account.username, undefined);
 						resolve(await this.login());
