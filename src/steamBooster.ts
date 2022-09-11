@@ -101,6 +101,8 @@ class SteamBooster {
 			this.client.once("loggedOn", listeners["loggedOn"]);
 			this.client.once("error", listeners["error"]);
 
+			this.log("Logging in..");
+
 			this.client.logOn(credentials);
 		});
 	}
