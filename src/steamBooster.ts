@@ -27,7 +27,7 @@ class SteamBooster {
 		if (this.account.password.length <= 0) throw new Error("Password is empty!");
 		if (this.account.games.length <= 0) throw new Error("Games are empty!");
 
-		this.client = new SteamClient();
+		this.client = new SteamClient({ dataDirectory: STEAM_DATA_PATH });
 
 		this.client.on("playingState", (blocked, playingApp) => {
 			this.blocked = blocked;
