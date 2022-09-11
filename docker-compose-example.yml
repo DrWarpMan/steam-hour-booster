@@ -4,7 +4,7 @@ services:
     container_name: steam-hour-booster
     restart: unless-stopped
     volumes:
-      - ./booster/credentials/:/usr/src/booster/credentials/
+      - ./booster/config/:/usr/src/booster/config/
       - ./booster/steam-data/:/usr/src/booster/steam-data/
     stdin_open: true # docker run -i
     tty: true # docker run -t

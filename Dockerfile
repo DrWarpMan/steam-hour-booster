@@ -6,9 +6,12 @@ FROM node:18-alpine
 WORKDIR /usr/src/booster
 
 COPY package*.json ./
+COPY tsconfig*.json ./
 
-RUN npm ci --omit=dev
+RUN npm ci
 
 COPY . .
 
-CMD ["npm", "start"]
+RUN npm run build
+
+CMD ["npm", "run", "serve"]
