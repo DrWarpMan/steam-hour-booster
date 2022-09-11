@@ -7,9 +7,9 @@
 	"type": "module",
 	"scripts": {
 		"serve": "node dist/index.js",
-		"build": "tsc",
+		"build": "npx tsc",
 		"start": "npm run build && npm run serve",
-		"watch": "tsc --watch"
+		"watch": "npx tsc --watch"
 	},
 	"repository": {
 		"type": "git",
