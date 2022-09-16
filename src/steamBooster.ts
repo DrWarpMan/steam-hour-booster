@@ -110,20 +110,40 @@ class SteamBooster {
 
 	checkErrors(): void {
 		this.client.once("error", async err => {
-			// relogin, if kicked out of session
-			if (err.eresult === SteamClient.EResult.LoggedInElsewhere) {
-				this.log("Someone else is playing, I need to re-login..");
+			switch (err.eresult) {
+				case SteamClient.EResult.LoggedInElsewhere:
+					// relogin, if someone else just started playing which resulted in kicking bot session
+					this.log("Someone else is playing, I need to re-login..");
 
-				try {
-					await this.login();
-					this.updateGames();
-				} catch (err: any) {
-					this.log(`Couldn't restart booster for this account, reason: ${err.message}`, true);
-				}
-			} else {
-				// just finish code execution, let it "crash"
-				this.log(`Error: ${SteamClient.EResult[err.eresult]}`);
-				console.log(err);
+					try {
+						await this.login();
+						this.updateGames();
+					} catch (err: any) {
+						this.log(`Couldn't restart booster for this account, reason: ${err.message}`, true);
+					}
+					break;
+
+				case SteamClient.EResult.NoConnection:
+				case SteamClient.EResult.ServiceUnavailable:
+					const RECONNECT_IN_MINUTES = 3;
+
+					this.log(
+						`No connection/service unavailable - trying to reconnect in ${RECONNECT_IN_MINUTES} minutes..`
+					);
+
+					setTimeout(async () => {
+						try {
+							await this.login();
+							this.updateGames();
+						} catch (err: any) {
+							this.log(`Couldn't restart booster for this account, reason: ${err.message}`, true);
+						}
+					}, RECONNECT_IN_MINUTES * 60 * 1000);
+
+					break;
+				default:
+					this.log(`Fatal Error: ${SteamClient.EResult[err.eresult]}`);
+					console.log(err);
 			}
 		});
 	}
