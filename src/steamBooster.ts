@@ -62,7 +62,7 @@ class SteamBooster {
 					break;
 				default:
 					this.log(`Disconnect event - unhandled error`);
-					console.log(`ID ${eresult} Message ${msg}`);
+					this.log(`Error information: ID ${eresult} Message ${msg}`);
 			}
 		});
 
@@ -145,7 +145,9 @@ class SteamBooster {
 
 				default:
 					this.log(`Error event - unhandled error`);
-					console.log(`ID ${err.eresult} Message ${SteamClient.EResult[err.eresult]}`);
+					console.log(
+						`Error information: ID ${err.eresult} Message ${SteamClient.EResult[err.eresult]}`
+					);
 			}
 		});
 	}
