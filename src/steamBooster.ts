@@ -40,10 +40,30 @@ class SteamBooster {
 			this.updateGames();
 		});
 
-		// just in case this event ever gets fired
 		this.client.on("disconnected", (eresult, msg) => {
-			console.log(eresult, msg);
-			console.log(SteamClient.EResult[eresult]);
+			switch (eresult) {
+				case SteamClient.EResult.NoConnection:
+				case SteamClient.EResult.ServiceUnavailable:
+					const RECONNECT_IN_MINUTES = 3;
+
+					this.log(
+						`No connection/service unavailable - trying to reconnect in ${RECONNECT_IN_MINUTES} minutes..`
+					);
+
+					setTimeout(async () => {
+						try {
+							await this.login();
+							this.updateGames();
+						} catch (err: any) {
+							this.log(`Couldn't restart booster for this account, reason: ${err.message}`, true);
+						}
+					}, RECONNECT_IN_MINUTES * 60 * 1000);
+
+					break;
+				default:
+					this.log(`Disconnect event - unhandled error`);
+					console.log(`ID ${eresult} Message ${msg}`);
+			}
 		});
 
 		this.client.on("loginKey", (key: string) => {
@@ -123,27 +143,9 @@ class SteamBooster {
 					}
 					break;
 
-				case SteamClient.EResult.NoConnection:
-				case SteamClient.EResult.ServiceUnavailable:
-					const RECONNECT_IN_MINUTES = 3;
-
-					this.log(
-						`No connection/service unavailable - trying to reconnect in ${RECONNECT_IN_MINUTES} minutes..`
-					);
-
-					setTimeout(async () => {
-						try {
-							await this.login();
-							this.updateGames();
-						} catch (err: any) {
-							this.log(`Couldn't restart booster for this account, reason: ${err.message}`, true);
-						}
-					}, RECONNECT_IN_MINUTES * 60 * 1000);
-
-					break;
 				default:
-					this.log(`Fatal Error: ${SteamClient.EResult[err.eresult]}`);
-					console.log(err);
+					this.log(`Error event - unhandled error`);
+					console.log(`ID ${err.eresult} Message ${SteamClient.EResult[err.eresult]}`);
 			}
 		});
 	}
