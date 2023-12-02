@@ -1,5 +1,13 @@
-function log(msg: string): void {
-	console.log(msg);
+import { loadConfig } from "./src/config";
+
+const configPath = Bun.env["CONFIG_PATH"];
+
+if(!configPath) {
+    throw new Error("Config path not set");
 }
 
-log("Hello, world!");
+const config = await loadConfig(configPath);
+
+for(const entry of config) {
+    console.log(entry);
+}

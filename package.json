@@ -1,31 +1,33 @@
 {
-	"name": "steam-hour-booster",
-	"version": "3.0.0",
-	"description": "Farm your in-game hours on Steam",
-	"author": {
-	  "email": "drwarpman@gmail.com",
-	  "name": "DrWarpMan"
-	},
-	"repository": "DrWarpMan/steam-hour-booster",
-	"keywords": [
-		"steam",
-		"hour",
-		"booster"
-	],
-	"license": "MIT",
-	"module": "index.ts",
-	"scripts": {},
-	"type": "module",
-	"devDependencies": {
-	  "@biomejs/biome": "1.4.1",
-	  "@total-typescript/ts-reset": "^0.5.1",
-	  "@tsconfig/bun": "^1.0.1",
-	  "@tsconfig/strictest": "^2.0.2",
-	  "@types/node": "^20.10.2",
-	  "bun-types": "latest"
-	},
-	"peerDependencies": {
-	  "typescript": "^5.0.0"
-	}
+  "name": "steam-hour-booster",
+  "version": "3.0.0",
+  "description": "Farm your in-game hours on Steam",
+  "author": {
+    "email": "drwarpman@gmail.com",
+    "name": "DrWarpMan"
+  },
+  "repository": "DrWarpMan/steam-hour-booster",
+  "keywords": [
+    "steam",
+    "hour",
+    "booster"
+  ],
+  "license": "MIT",
+  "module": "index.ts",
+  "scripts": {},
+  "type": "module",
+  "devDependencies": {
+    "@biomejs/biome": "1.4.1",
+    "@total-typescript/ts-reset": "^0.5.1",
+    "@tsconfig/bun": "^1.0.1",
+    "@tsconfig/strictest": "^2.0.2",
+    "@types/node": "^20.10.2",
+    "bun-types": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "zod": "^3.22.4"
   }
-  
+}
