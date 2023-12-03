@@ -22,12 +22,14 @@
     "@tsconfig/bun": "^1.0.1",
     "@tsconfig/strictest": "^2.0.2",
     "@types/node": "^20.10.2",
+    "@types/steam-user": "^4.26.8",
     "bun-types": "latest"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "steam-user": "^5.0.4",
     "zod": "^3.22.4"
   }
 }

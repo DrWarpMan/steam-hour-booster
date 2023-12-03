@@ -1,4 +1,6 @@
 config.json
+steam-data
+token-storage
 
 # Based on https://raw.githubusercontent.com/github/gitignore/main/Node.gitignore
 
