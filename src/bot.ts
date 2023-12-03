@@ -2,7 +2,7 @@ import Steam from "steam-user";
 import { TokenStorage } from "./token-storage";
 
 export const TOKEN_STORAGE_DIRECTORY =
-	Bun.env["TOKEN_STORAGE_DIRECTORY"] ?? "./token-storage";
+	Bun.env["TOKEN_STORAGE_DIRECTORY"] ?? "./tokens";
 
 const ts = new TokenStorage(TOKEN_STORAGE_DIRECTORY);
 
