@@ -45,4 +45,18 @@ export class TokenStorage {
 
         await Bun.write(path, token);
     }
+
+    async deleteToken(key: string): Promise<void> {
+        const path = this.#formatPath(key);
+
+        return new Promise((resolve, reject) => {
+            fs.unlink(path, (err) => {
+                if(err) {
+                    reject(err);
+                } else {
+                    resolve();
+                }
+            });
+        });
+    }
 }
