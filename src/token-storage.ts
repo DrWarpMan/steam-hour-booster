@@ -1,7 +1,13 @@
 import fs from "node:fs";
 import { join } from "path";
 
-export class TokenStorage {
+export interface TokenStorage {
+    getToken(key: string): Promise<string|null>;
+    setToken(key: string, token: string): Promise<void>;
+    deleteToken(key: string): Promise<void>;
+}
+
+export class DefaultTokenStorage implements TokenStorage {
     readonly #directory: string;
 
     constructor(directory: string) {

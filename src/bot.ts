@@ -1,10 +1,5 @@
 import Steam from "steam-user";
-import { TokenStorage } from "./token-storage";
-
-export const TOKEN_STORAGE_DIRECTORY =
-	Bun.env["TOKEN_STORAGE_DIRECTORY"] ?? "./tokens";
-
-const ts = new TokenStorage(TOKEN_STORAGE_DIRECTORY);
+import type { TokenStorage } from "./token-storage";
 
 export const STEAM_DATA_DIRECTORY =
 	Bun.env["STEAM_DATA_DIRECTORY"] ?? "./steam-data";
@@ -16,19 +11,16 @@ export class Bot {
 	#password: string;
 	#games: number[];
 	#steam: Steam;
+	#tokenStorage?: TokenStorage;
 
-	#getRefreshToken(): Promise<string | null> {
-		return ts.getToken(this.#username);
-	}
-
-	#setRefreshToken(refreshToken: string): Promise<void> {
-		return ts.setToken(this.#username, refreshToken);
-	}
-
-	constructor(username: string, password: string, games: number[]) {
+	constructor(username: string, password: string, games: number[], tokenStorage?: TokenStorage) {
 		this.#username = username.toLowerCase();
 		this.#password = password;
 		this.#games = games;
+
+		if(tokenStorage) {
+			this.#tokenStorage = tokenStorage;
+		}
 
 		this.#steam = new Steam({
 			autoRelogin: false,
@@ -52,26 +44,38 @@ export class Bot {
 		});
 
 		// @ts-expect-error missing type
-		this.#steam.on("refreshToken", (refreshToken) => {
-			this.#log(`New refresh token: ${refreshToken}`);
+		this.#steam.on("refreshToken", (refreshToken: unknown) => {
+			if(typeof refreshToken !== "string") {
+				throw new Error("refreshToken is not a string");
+			}
 
-			this.#setRefreshToken(refreshToken);
+			this.#log(`New refresh token: ${refreshToken}`);
+			this.#tokenStorage?.setToken(this.#username, refreshToken);
 		});
 	}
 
 	async login(): Promise<void> {
-		const p = new Promise<void>((resolve, reject) => {
-			this.#steam.once("loggedOn", () => {
-				resolve();
-			});
+		let afterLogin: () => void;
+		let afterError: (err: unknown) => void;
 
-			this.#steam.once("error", (err) => {
+		const p = new Promise<void>((resolve, reject) => {
+			afterLogin = () => {
+				resolve();
+			}
+
+			afterError = async (err) => {
 				reject(err);
-			});
+			}
+
+			this.#steam.once("loggedOn", afterLogin);
+			this.#steam.once("error", afterError);
+		}).finally(() => {
+			this.#steam.removeListener("loggedOn", afterLogin);
+			this.#steam.removeListener("error", afterError);
 		});
 
 		const details = await this.#createLoginDetails();
-		
+
 		this.#steam.logOn(details);
 
 		return p;
@@ -82,7 +86,7 @@ export class Bot {
 			renewRefreshTokens: true,
 		};
 
-		const token = await this.#getRefreshToken();
+		const token = await this.#tokenStorage?.getToken(this.#username);
 
 		if (token) {
 			return {
