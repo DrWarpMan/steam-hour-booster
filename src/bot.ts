@@ -1,3 +1,4 @@
+import pRetry from "p-retry";
 import Steam from "steam-user";
 import type { TokenStorage } from "./token-storage";
 
@@ -12,13 +13,20 @@ export class Bot {
 	#games: number[];
 	#steam: Steam;
 	#tokenStorage?: TokenStorage;
+	#pauseErrors = false;
+	#blocked = false;
 
-	constructor(username: string, password: string, games: number[], tokenStorage?: TokenStorage) {
+	constructor(
+		username: string,
+		password: string,
+		games: number[],
+		tokenStorage?: TokenStorage,
+	) {
 		this.#username = username.toLowerCase();
 		this.#password = password;
 		this.#games = games;
 
-		if(tokenStorage) {
+		if (tokenStorage) {
 			this.#tokenStorage = tokenStorage;
 		}
 
@@ -40,12 +48,31 @@ export class Bot {
 		});
 
 		this.#steam.on("error", (err) => {
+			if (this.#pauseErrors) {
+				return;
+			}
+
 			this.#log(`Error: ${err.message}`);
+
+			this.#handleError(err);
+		});
+
+		this.#steam.on("playingState", (blocked, playingApp) => {
+			this.#blocked = blocked;
+
+			// If we're not blocked & we are already playing something
+			if (!blocked && playingApp !== 0) {
+				return;
+			}
+
+			this.#log(`Playing state changed: ${blocked} (App ID: ${playingApp})`);
+
+			this.#play();
 		});
 
 		// @ts-expect-error missing type
 		this.#steam.on("refreshToken", (refreshToken: unknown) => {
-			if(typeof refreshToken !== "string") {
+			if (typeof refreshToken !== "string") {
 				throw new Error("refreshToken is not a string");
 			}
 
@@ -55,30 +82,43 @@ export class Bot {
 	}
 
 	async login(): Promise<void> {
-		let afterLogin: () => void;
-		let afterError: (err: unknown) => void;
+		this.#log("Logging in...");
 
-		const p = new Promise<void>((resolve, reject) => {
-			afterLogin = () => {
-				resolve();
-			}
+		if (this.isLoggedIn) {
+			console.warn("Already logged in.");
+			return;
+		}
 
-			afterError = async (err) => {
-				reject(err);
-			}
+		try {
+			let afterLogin: () => void;
+			let afterError: (err: unknown) => void;
 
-			this.#steam.once("loggedOn", afterLogin);
-			this.#steam.once("error", afterError);
-		}).finally(() => {
-			this.#steam.removeListener("loggedOn", afterLogin);
-			this.#steam.removeListener("error", afterError);
-		});
+			const p = new Promise<void>((resolve, reject) => {
+				afterLogin = () => {
+					resolve();
+				};
 
-		const details = await this.#createLoginDetails();
+				afterError = async (err) => {
+					reject(err);
+				};
 
-		this.#steam.logOn(details);
+				this.#steam.once("loggedOn", afterLogin);
+				this.#steam.once("error", afterError);
+			}).finally(() => {
+				this.#steam.removeListener("loggedOn", afterLogin);
+				this.#steam.removeListener("error", afterError);
+			});
 
-		return p;
+			const details = await this.#createLoginDetails();
+
+			this.#pauseErrors = true;
+
+			this.#steam.logOn(details);
+
+			await p;
+		} finally {
+			this.#pauseErrors = false;
+		}
 	}
 
 	async #createLoginDetails(): Promise<LoginDetails> {
@@ -102,7 +142,41 @@ export class Bot {
 		};
 	}
 
-	async start(): Promise<void> {
-		console.info("starting");
+	#play() {
+		if (this.#blocked) {
+			this.#steam.gamesPlayed([]);
+			this.#log("Stopped playing.");
+		} else {
+			this.#steam.gamesPlayed(this.#games);
+			this.#log(`Playing ${this.#games.length} games.`);
+		}
+	}
+
+	get isLoggedIn() {
+		return !!(
+			this.#steam.steamID &&
+			this.#steam.publicIP &&
+			this.#steam.cellID
+		);
+	}
+
+	async #handleError(err: Error & { eresult: Steam.EResult }): Promise<void> {
+		console.error(err);
+
+		try {
+			await pRetry(() => this.login(), {
+				retries: 5,
+				factor: 3,
+				minTimeout: 10 * 1000,
+				maxTimeout: 300 * 1000,
+			});
+
+			this.#log("Re-login successful.");
+		} catch (err) {
+			console.error(err);
+
+			this.#log("Could not re-login after multiple attempts, logging off.");
+			this.#steam.logOff();
+		}
 	}
 }

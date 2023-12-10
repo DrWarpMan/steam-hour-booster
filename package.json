@@ -29,6 +29,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "p-retry": "^6.1.0",
     "steam-user": "^5.0.4",
     "zod": "^3.22.4"
   }
