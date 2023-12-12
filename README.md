@@ -1,5 +1,4 @@
 # steam-hour-booster
-> Farm your in-game hours on Steam
 
 This program allows you to **farm your in-game hours on** Steam.\
 You can use it to farm hours for **multiple games on multiple accounts at once**.\
