@@ -2,11 +2,7 @@ import { Bot } from "./src/bot";
 import { loadConfig } from "./src/config";
 import { DefaultTokenStorage } from "./src/token-storage";
 
-const configPath = Bun.env["CONFIG_PATH"];
-
-if (!configPath) {
-	throw new Error("Config path not set");
-}
+const configPath = Bun.env["CONFIG_PATH"] ?? "./config.json";
 
 const config = await loadConfig(configPath);
 
