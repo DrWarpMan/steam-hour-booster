@@ -14,14 +14,18 @@ export const configSchema = z.array(
 export type Config = z.infer<typeof configSchema>;
 
 export const loadConfig = async (path: string): Promise<Config> => {
-	const json = await Bun.file(path).json<unknown>();
+	try {
+		const json = await Bun.file(path).json<unknown>();
 
-	const result = await configSchema.safeParseAsync(json);
+		const result = await configSchema.safeParseAsync(json);
 
-	if (!result.success) {
-		console.error("Cannot parse config file");
-		throw result.error;
+		if (!result.success) {
+			throw result.error;
+		}
+
+		return result.data;
+	} catch (e) {
+		console.error("Can not read/parse config file.");
+		throw e;
 	}
-
-	return result.data;
 };
