@@ -1,3 +1,5 @@
+# docker buildx build -t drwarpman/steam-hour-booster --builder=amd64-arm64 --platform linux/amd64,linux/arm64 --no-cache --push .
+
 FROM oven/bun:1.0.17 as base
 
 WORKDIR /app
