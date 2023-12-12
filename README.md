@@ -33,7 +33,7 @@ Run:
 bun run index.ts
 ```
 
-If your accounts have Steam Guard enabled, you will be prompted to enter Steam Guard codes for each account.\
+If your accounts have Steam Guard enabled, you will be prompted to enter Steam Guard codes for each account.
 This is only needed once, the [refresh tokens](https://github.com/DoctorMcKay/node-steam-user?tab=readme-ov-file#using-refresh-tokens) will be stored in the `TOKEN_STORAGE_DIRECTORY` directory, and will be used to automatically log in to your accounts in the future.
 
 To run the program in the background, I recommend using [Docker](#docker), but you can also use your own solution.\
