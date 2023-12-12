@@ -1,0 +1,11 @@
+services:
+  booster:
+    container_name: booster
+    image: drwarpman/steam-hour-booster:latest
+    restart: unless-stopped
+    volumes:
+      - ./config.json:/app/config.json
+      - ./steam-data:/app/steam-data
+      - ./tokens:/app/tokens
+    stdin_open: true
+    tty: true

@@ -1,75 +1,93 @@
 # steam-hour-booster
 
-Boosts your Steam games playtime
+This program allows you to **farm your in-game hours on** Steam.\
+You can use it to farm hours for **multiple games on multiple accounts at once**.\
+Accounts with **Steam Guard** enabled are **supported**.
 
-## Information
+Uses [node-steam-user](https://github.com/DoctorMcKay/node-steam-user) library for communicating with Steam.
 
-Steam Hour Booster will log in to your Steam account(s) and make you seem
-as if you were playing certain game(s) which results in increasing your Steam playtime for that specific game(s).
+**Note:** *This software is not affiliated with Valve Corporation or Steam.*
 
-> **Note:** This way of boosting hours is not breaking any rules, thus it won't get your account banned.
+## Table of contents
+- [Requirements](#requirements)
+- [Usage](#usage)
+- [Configuration](#configuration)
+- [Environment variables](#environment-variables)
+- [Docker](#docker)
+- [FAQ](#faq)
 
-### Steam Guard
+## Requirements
+- [Bun](https://bun.sh/) (or [Docker](https://www.docker.com/))
 
-- fully supports boosting accounts with or without Steam Guard (both e-mail & phone app)
+## Usage
 
-### Docker
-
-Docker version can be found here: https://hub.docker.com/r/drwarpman/steam-hour-booster
-
-## Download & Install & Build
-
-Clone the repository:
-
-```bash
-git clone https://github.com/DrWarpMan/steam-hour-booster.git
-cd steam-hour-booster
-```
-
-then install the packages:
+Install dependencies:
 
 ```bash
-npm install
+bun install
 ```
 
-and build:
+Run:
 
 ```bash
-npm run build
+bun run index.ts
 ```
 
-## Configure
+If your accounts have Steam Guard enabled, you will be prompted to enter Steam Guard codes for each account.
+Once logged in, a [refresh token](https://github.com/DoctorMcKay/node-steam-user?tab=readme-ov-file#using-refresh-tokens) will be stored and used to automatically log in to your accounts in the future.
+
+To run the program in the background, I recommend using [Docker](#docker), but you can also use your own solution.\
+*Before running the program in the background, make sure to run it once normally to be able to enter your Steam Guard codes (if needed).*
+
+## Configuration
+
+Configuration consists of a JSON file containing a list of accounts to farm hours on.
 
 Copy the default configuration:
 
 ```bash
-cp ./accounts.default.json ./config/accounts.json
+cp config-example.json config.json
 ```
 
-and configure to your needs.
+Edit the configuration file to your liking.
 
-Default accounts.default.json file:
+*Example configuration:*
 
 ```json
 [
-	{
-		"username": "foo",
-		"password": "bar",
-		"games": [730]
-	}
+    {
+        "username": "foo",
+        "password": "bar",
+        "games": [730]
+    }
 ]
 ```
 
-You can have multiple accounts with each playing multiple games at once.
+You can add as many accounts as you want.
 
-## Serve
+The `games` array contains the IDs of the games you want to farm hours for.\
+Game IDs can be found on [SteamDB](https://steamdb.info/).\
+I believe the maximum amount of games you can play at once on a single account is **32**.
+
+## Environment variables
+If needed, use a `.env` file to configure environment variables.
 
 ```bash
-npm run serve
+cp .env.template .env
 ```
 
-If you use Steam Guard, you need to run this app attached to it's console first, so that you can input your Steam Guard code,
-afterwards it saves the "session" and you don't need to worry about Steam Guard anymore.
+| Name | Description | Default value |
+| --- | --- | --- |
+| `CONFIG_PATH` | Path to the config file | `./config.json` |
+| `STEAM_DATA_DIRECTORY` | Path to the directory where Steam will store it's data | `./steam-data` |
+| `TOKEN_STORAGE_DIRECTORY` | Path to the directory where Steam refresh tokens will be stored, used for remembering sessions | `./tokens` |
 
-You should run this on a 24/7 online server to make this effective.
-To run it in the background, use either PM2 or docker version of this app.
+## Docker
+
+For Docker usage, see [here](https://hub.docker.com/r/drwarpman/steam-hour-booster).
+
+## FAQ
+
+### Is this safe to use?
+People have been using similar programs for years (decades?) without any issues.\
+Don't take my word for it though, use at your own risk.

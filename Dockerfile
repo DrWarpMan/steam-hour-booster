@@ -1,17 +1,19 @@
-# docker buildx create --name amd64-arm64 --driver docker-container
-# docker buildx build -t drwarpman/steam-hour-booster --builder=amd64-arm64 --platform linux/amd64,linux/arm64/v8,linux/arm/v7 --no-cache --push .
+# docker buildx build -t drwarpman/steam-hour-booster --builder=amd64-arm64 --platform linux/amd64,linux/arm64 --no-cache --push .
 
-FROM node:18-alpine
+FROM oven/bun:1.0.17 as base
 
-WORKDIR /usr/src/booster
+WORKDIR /app
 
-COPY package*.json ./
-COPY tsconfig*.json ./
+FROM base AS install
 
-RUN npm ci
+RUN mkdir -p /temp/prod
+COPY package.json bun.lockb /temp/prod/
+RUN cd /temp/prod && bun install --frozen-lockfile --production --ignore-scripts
 
-COPY . .
+FROM base AS release
+COPY --from=install /temp/prod/node_modules node_modules
+COPY src/ src
+COPY index.ts .
+COPY package.json .
 
-RUN npm run build
-
-CMD ["npm", "run", "serve"]
+ENTRYPOINT [ "bun", "run", "index.ts" ]
