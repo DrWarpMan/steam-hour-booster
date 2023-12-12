@@ -1,13 +1,18 @@
 # steam-hour-booster
 > Farm your in-game hours on Steam
 
-To install dependencies:
+## Requirements
+- [Bun](https://bun.sh/)
+
+## Usage
+
+Install dependencies:
 
 ```bash
 bun install
 ```
 
-To run:
+Run:
 
 ```bash
 bun .
@@ -16,4 +21,6 @@ or
 ```bash
 bun run index.ts
 ```
+
+## Configuration
 
