@@ -70,13 +70,24 @@ export class Bot {
 			this.#play();
 		});
 
+		this.#steam.on("steamGuard", async (_, callback) => {
+			const code = prompt(`[${this.#username}] Steam Guard code:`);
+
+			if (!code) {
+				console.error("No Steam Guard code provided, exiting.");
+				process.exit(0);
+			}
+
+			callback(code);
+		});
+
 		// @ts-expect-error missing type
 		this.#steam.on("refreshToken", (refreshToken: unknown) => {
 			if (typeof refreshToken !== "string") {
 				throw new Error("refreshToken is not a string");
 			}
 
-			this.#log(`New refresh token: ${refreshToken}`);
+			this.#log("New refresh token received.");
 			this.#tokenStorage?.setToken(this.#username, refreshToken);
 		});
 	}
@@ -165,10 +176,9 @@ export class Bot {
 
 		try {
 			await pRetry(() => this.login(), {
-				retries: 5,
-				factor: 3,
+				retries: 10,
+				factor: 2,
 				minTimeout: 10 * 1000,
-				maxTimeout: 300 * 1000,
 			});
 
 			this.#log("Re-login successful.");
