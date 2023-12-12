@@ -6,7 +6,7 @@ Accounts with **Steam Guard** enabled are **supported**.
 
 Uses [node-steam-user](https://github.com/DoctorMcKay/node-steam-user) library for communicating with Steam.
 
-**Note:** *This software is not affiliated with Valve Corporation or Steam.*
+*This software is not affiliated with Valve Corporation or Steam.*
 
 ## Table of contents
 - [Requirements](#requirements)
