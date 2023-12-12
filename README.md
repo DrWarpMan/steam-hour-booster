@@ -15,10 +15,6 @@ bun install
 Run:
 
 ```bash
-bun .
-```
-or
-```bash
 bun run index.ts
 ```
 
