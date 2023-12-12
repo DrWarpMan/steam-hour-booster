@@ -10,7 +10,12 @@
   "keywords": [
     "steam",
     "hour",
-    "booster"
+    "booster",
+    "farmer",
+    "idler",
+    "idle",
+    "farming",
+    "hours"
   ],
   "license": "MIT",
   "module": "index.ts",
