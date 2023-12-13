@@ -95,11 +95,6 @@ export class Bot {
 	async login(): Promise<void> {
 		this.#log("Logging in...");
 
-		if (this.isLoggedIn) {
-			console.warn("Already logged in.");
-			return;
-		}
-
 		try {
 			let afterLogin: () => void;
 			let afterError: (err: unknown) => void;
@@ -161,14 +156,6 @@ export class Bot {
 			this.#steam.gamesPlayed(this.#games);
 			this.#log(`Playing ${this.#games.length} games.`);
 		}
-	}
-
-	get isLoggedIn() {
-		return !!(
-			this.#steam.steamID &&
-			this.#steam.publicIP &&
-			this.#steam.cellID
-		);
 	}
 
 	async #handleError(err: Error & { eresult: Steam.EResult }): Promise<void> {
