@@ -162,6 +162,8 @@ export class Bot {
 		console.error(err);
 
 		try {
+			this.#steam.logOff();
+
 			await pRetry(() => this.login(), {
 				retries: 10,
 				factor: 2,
