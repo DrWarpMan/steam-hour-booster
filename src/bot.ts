@@ -47,6 +47,10 @@ export class Bot {
 			this.#log("Logged in.");
 		});
 
+		this.#steam.on("disconnected", (eresult, msg) => {
+			console.log("[DEBUG] event: disconnected", eresult, msg);
+		});
+
 		this.#steam.on("error", (err) => {
 			if (this.#pauseErrors) {
 				return;
@@ -127,6 +131,26 @@ export class Bot {
 		}
 	}
 
+	async logout(): Promise<void> {
+		this.#log("Logging out...");
+
+		let afterLogout: () => void;
+
+		const p = new Promise<void>((resolve) => {
+			afterLogout = () => {
+				resolve();
+			};
+
+			this.#steam.once("disconnected", afterLogout);
+		}).finally(() => {
+			this.#steam.removeListener("disconnected", afterLogout);
+		});
+
+		this.#steam.logOff();
+
+		await p;
+	}
+
 	async #createLoginDetails(): Promise<LoginDetails> {
 		const details = {
 			renewRefreshTokens: true,
@@ -162,7 +186,7 @@ export class Bot {
 		console.error(err);
 
 		try {
-			this.#steam.logOff();
+			await this.logout();
 
 			await pRetry(() => this.login(), {
 				retries: 10,
