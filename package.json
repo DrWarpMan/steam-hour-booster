@@ -28,7 +28,7 @@
     "@tsconfig/strictest": "^2.0.2",
     "@types/node": "^20.10.4",
     "@types/steam-user": "^4.26.8",
-    "bun-types": "latest"
+    "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
