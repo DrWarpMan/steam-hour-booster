@@ -189,7 +189,7 @@ export class Bot {
 			await this.logout();
 
 			await pRetry(() => this.login(), {
-				retries: 10,
+				retries: 20,
 				factor: 2,
 				minTimeout: 10 * 1000,
 			});
