@@ -32,7 +32,7 @@ bun install
 Run:
 
 ```bash
-bun run index.ts
+bun .
 ```
 
 If your accounts have Steam Guard enabled, you will be prompted to enter Steam Guard codes for each account.
