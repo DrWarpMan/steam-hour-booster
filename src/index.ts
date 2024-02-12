@@ -1,6 +1,6 @@
-import { Bot } from "./src/bot";
-import { loadConfig } from "./src/config";
-import { DefaultTokenStorage } from "./src/token-storage";
+import { Bot } from "./bot";
+import { loadConfig } from "./config";
+import { DefaultTokenStorage } from "./token-storage";
 
 const configPath = Bun.env["CONFIG_PATH"] ?? "./config.json";
 

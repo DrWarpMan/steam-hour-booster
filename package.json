@@ -18,7 +18,7 @@
     "hours"
   ],
   "license": "MIT",
-  "module": "index.ts",
+  "module": "src/index.ts",
   "scripts": {},
   "type": "module",
   "devDependencies": {

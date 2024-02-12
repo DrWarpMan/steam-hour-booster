@@ -14,7 +14,6 @@ RUN cd /temp/prod && bun install --frozen-lockfile --production --ignore-scripts
 FROM base AS release
 COPY --from=install /temp/prod/node_modules node_modules
 COPY src/ src
-COPY index.ts .
 COPY package.json .
 
-ENTRYPOINT [ "bun", "run", "index.ts" ]
+ENTRYPOINT [ "bun", "." ]
