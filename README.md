@@ -73,8 +73,10 @@ The `games` array contains the IDs of the games you want to farm hours for.\
 Game IDs can be found on [SteamDB](https://steamdb.info/).\
 I believe the maximum amount of games you can play at once on a single account is **32**.
 
+You can also add `"online": true` to make the account appear online & in-game while farming hours. This is disabled by default.
+
 ## Environment variables
-You can provide a `.env` file to configure environment variables.
+You can provide a `.env` file to configure environment variables. You probably won't need to modify these anyway.
 
 Copy the template:
 ```bash
