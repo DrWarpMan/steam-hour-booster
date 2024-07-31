@@ -8,5 +8,6 @@ README.md
 LICENSE
 .vscode
 .env
+config.json
 tokens
 steam-data
