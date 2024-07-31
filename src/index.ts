@@ -12,7 +12,13 @@ export const TOKEN_STORAGE_DIRECTORY =
 const ts = new DefaultTokenStorage(TOKEN_STORAGE_DIRECTORY);
 
 for (const entry of config) {
-	const bot = new Bot(entry.username, entry.password, entry.games, ts);
+	const bot = new Bot(
+		entry.username,
+		entry.password,
+		entry.games,
+		ts,
+		entry.online,
+	);
 
 	await bot.login();
 }

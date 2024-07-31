@@ -11,8 +11,9 @@ export class Bot {
 	#username: string;
 	#password: string;
 	#games: number[];
+	#online: boolean;
 	#steam: Steam;
-	#tokenStorage?: TokenStorage;
+	#tokenStorage: TokenStorage | null;
 	#pauseErrors = false;
 	#blocked = false;
 
@@ -20,15 +21,14 @@ export class Bot {
 		username: string,
 		password: string,
 		games: number[],
-		tokenStorage?: TokenStorage,
+		tokenStorage: TokenStorage | null = null,
+		online = false,
 	) {
 		this.#username = username.toLowerCase();
 		this.#password = password;
 		this.#games = games;
-
-		if (tokenStorage) {
-			this.#tokenStorage = tokenStorage;
-		}
+		this.#online = online;
+		this.#tokenStorage = tokenStorage;
 
 		this.#steam = new Steam({
 			autoRelogin: false,
@@ -121,6 +121,10 @@ export class Bot {
 			this.#steam.logOn(details);
 
 			await p;
+
+			if (this.#online) {
+				this.#steam.setPersona(Steam.EPersonaState.Online);
+			}
 		} finally {
 			this.#pauseErrors = false;
 		}
