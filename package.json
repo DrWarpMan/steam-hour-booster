@@ -1,6 +1,6 @@
 {
   "name": "steam-hour-booster",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Farm your in-game hours on Steam",
   "author": {
     "email": "drwarpman@gmail.com",
@@ -22,20 +22,20 @@
   "scripts": {},
   "type": "module",
   "devDependencies": {
-    "@biomejs/biome": "1.4.1",
+    "@biomejs/biome": "1.8.3",
     "@total-typescript/ts-reset": "^0.5.1",
-    "@tsconfig/bun": "^1.0.1",
-    "@tsconfig/strictest": "^2.0.2",
-    "@types/node": "^20.10.4",
-    "@types/steam-user": "^4.26.8",
-    "@types/bun": "latest"
+    "@tsconfig/bun": "^1.0.7",
+    "@tsconfig/strictest": "^2.0.5",
+    "@types/node": "^22.0.0",
+    "@types/steam-user": "^5.0.0",
+    "@types/bun": "^1.1.6"
   },
   "peerDependencies": {
-    "typescript": "^5.0.0"
+    "typescript": "^5.5.4"
   },
   "dependencies": {
-    "p-retry": "^6.1.0",
-    "steam-user": "^5.0.4",
-    "zod": "^3.22.4"
+    "p-retry": "^6.2.0",
+    "steam-user": "^5.0.10",
+    "zod": "^3.23.8"
   }
 }

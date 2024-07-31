@@ -85,12 +85,7 @@ export class Bot {
 			callback(code);
 		});
 
-		// @ts-expect-error missing type
-		this.#steam.on("refreshToken", (refreshToken: unknown) => {
-			if (typeof refreshToken !== "string") {
-				throw new Error("refreshToken is not a string");
-			}
-
+		this.#steam.on("refreshToken", (refreshToken) => {
 			this.#log("New refresh token received.");
 			this.#tokenStorage?.setToken(this.#username, refreshToken);
 		});
