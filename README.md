@@ -40,7 +40,7 @@ Once logged in, a [refresh token](https://github.com/DoctorMcKay/node-steam-user
 
 To take full advantage of this program, you should run it on a device (server) that is always running.
 
-To run the program in the background, I recommend using [Docker](#docker), but you can also use your own solution.\
+To run the program in the background, I recommend using [Docker](#docker), but you can also setup your own solution.\
 *Before running the program in the background, make sure to run it once normally to be able to enter your Steam Guard codes (if needed).*
 
 ## Configuration
@@ -74,8 +74,9 @@ Game IDs can be found on [SteamDB](https://steamdb.info/).\
 I believe the maximum amount of games you can play at once on a single account is **32**.
 
 ## Environment variables
-If needed, use a `.env` file to configure environment variables.
+You can provide a `.env` file to configure environment variables.
 
+Copy the template:
 ```bash
 cp .env.template .env
 ```
