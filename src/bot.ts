@@ -1,5 +1,5 @@
 import pRetry from "p-retry";
-import Steam from "steam-user";
+import Steam, { EConnectionProtocol } from "steam-user";
 import type { TokenStorage } from "./token-storage";
 
 export const STEAM_DATA_DIRECTORY =
@@ -33,6 +33,7 @@ export class Bot {
 		this.#steam = new Steam({
 			autoRelogin: false,
 			dataDirectory: STEAM_DATA_DIRECTORY,
+			protocol: EConnectionProtocol.TCP,
 		});
 
 		this.#setup();
