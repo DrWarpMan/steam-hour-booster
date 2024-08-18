@@ -1,9 +1,7 @@
 import pRetry from "p-retry";
 import Steam, { EConnectionProtocol } from "steam-user";
+import { convertRelativePath } from "./path";
 import type { TokenStorage } from "./token-storage";
-
-export const STEAM_DATA_DIRECTORY =
-	Bun.env["STEAM_DATA_DIRECTORY"] ?? "./steam-data";
 
 type LoginDetails = Parameters<Steam["logOn"]>[0];
 
@@ -21,6 +19,7 @@ export class Bot {
 		username: string,
 		password: string,
 		games: number[],
+		dataDirectory: string,
 		tokenStorage: TokenStorage | null = null,
 		online = false,
 	) {
@@ -32,7 +31,7 @@ export class Bot {
 
 		this.#steam = new Steam({
 			autoRelogin: false,
-			dataDirectory: STEAM_DATA_DIRECTORY,
+			dataDirectory: convertRelativePath(dataDirectory),
 			protocol: EConnectionProtocol.TCP,
 		});
 

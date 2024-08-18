@@ -1,5 +1,6 @@
 import fs from "node:fs";
-import { join } from "path";
+import { join } from "node:path";
+import { convertRelativePath } from "./path";
 
 export interface TokenStorage {
 	getToken(key: string): Promise<string | null>;
@@ -11,7 +12,7 @@ export class DefaultTokenStorage implements TokenStorage {
 	readonly #directory: string;
 
 	constructor(directory: string) {
-		this.#directory = directory;
+		this.#directory = convertRelativePath(directory);
 
 		if (!fs.existsSync(this.#directory)) {
 			fs.mkdirSync(this.#directory);

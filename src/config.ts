@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { convertRelativePath } from "./path";
 
 export const configSchema = z.array(
 	z.object({
@@ -16,7 +17,9 @@ export type Config = z.infer<typeof configSchema>;
 
 export const loadConfig = async (path: string): Promise<Config> => {
 	try {
-		const json = (await Bun.file(path).json()) as unknown;
+		const resolvedPath = convertRelativePath(path);
+
+		const json = (await Bun.file(resolvedPath).json()) as unknown;
 
 		const result = await configSchema.safeParseAsync(json);
 
