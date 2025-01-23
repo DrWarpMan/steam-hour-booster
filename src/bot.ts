@@ -94,60 +94,45 @@ export class Bot {
 	async login(): Promise<void> {
 		this.#log("Logging in...");
 
-		try {
-			let afterLogin: () => void;
-			let afterError: (err: unknown) => void;
+		const details = await this.#createLoginDetails();
+		
+		const {promise, resolve, reject} = Promise.withResolvers();
 
-			const p = new Promise<void>((resolve, reject) => {
-				afterLogin = () => {
-					resolve();
-				};
+		const loggedOnCallback = () => resolve();
+		const errorCallback = (err: unknown) => reject(err);
 
-				afterError = async (err) => {
-					reject(err);
-				};
-
-				this.#steam.once("loggedOn", afterLogin);
-				this.#steam.once("error", afterError);
-			}).finally(() => {
-				this.#steam.removeListener("loggedOn", afterLogin);
-				this.#steam.removeListener("error", afterError);
-			});
-
-			const details = await this.#createLoginDetails();
-
-			this.#pauseErrors = true;
-
-			this.#steam.logOn(details);
-
-			await p;
-
-			if (this.#online) {
-				this.#steam.setPersona(Steam.EPersonaState.Online);
-			}
-		} finally {
+		// Register the callbacks & disable global error handling
+		this.#pauseErrors = true;
+		this.#steam.once("loggedOn", loggedOnCallback);
+		this.#steam.once("error", errorCallback);
+		
+		// Cleanup the callbacks & re-enable global error handling after the promise resolves
+		promise.finally(() => {
+			this.#steam.removeListener("loggedOn", loggedOnCallback);
+			this.#steam.removeListener("error", errorCallback);
 			this.#pauseErrors = false;
+		});
+
+		// Try to log in
+		this.#steam.logOn(details);
+
+		await promise;
+
+		if (this.#online) {
+			this.#steam.setPersona(Steam.EPersonaState.Online);
 		}
 	}
 
 	async logout(): Promise<void> {
 		this.#log("Logging out...");
 
-		let afterLogout: () => void;
+		const {promise, resolve} = Promise.withResolvers();
 
-		const p = new Promise<void>((resolve) => {
-			afterLogout = () => {
-				resolve();
-			};
-
-			this.#steam.once("disconnected", afterLogout);
-		}).finally(() => {
-			this.#steam.removeListener("disconnected", afterLogout);
-		});
+		this.#steam.once("disconnected", () => resolve());
 
 		this.#steam.logOff();
 
-		await p;
+		await promise;
 	}
 
 	async #createLoginDetails(): Promise<LoginDetails> {
