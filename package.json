@@ -22,21 +22,21 @@
   "scripts": {},
   "type": "module",
   "devDependencies": {
-    "@biomejs/biome": "1.9.3",
+    "@biomejs/biome": "1.9.4",
     "@total-typescript/ts-reset": "^0.6.1",
     "@tsconfig/bun": "^1.0.7",
     "@tsconfig/strictest": "^2.0.5",
-    "@types/node": "^22.7.5",
-    "@types/steam-user": "^5.0.3",
-    "@types/bun": "^1.1.11"
+    "@types/node": "^22.10.10",
+    "@types/steam-user": "^5.0.4",
+    "@types/bun": "^1.2.0"
   },
   "peerDependencies": {
-    "typescript": "^5.6.3"
+    "typescript": "^5.7.3"
   },
   "dependencies": {
-    "p-retry": "^6.2.0",
+    "p-retry": "^6.2.1",
     "pkg-dir": "^8.0.0",
     "steam-user": "^5.2.0",
-    "zod": "^3.23.8"
+    "zod": "^3.24.1"
   }
 }
