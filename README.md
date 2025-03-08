@@ -37,7 +37,7 @@ Once logged in, a [refresh token](https://github.com/DoctorMcKay/node-steam-user
 
 ### Run in the background
 To take full advantage of this program, you most likely want to run it on a machine that is always running.\
-I recommend using [Docker](#docker).
+I recommend using [Docker](#docker) to achieve this, but you are free to use your own solution.
 
 *Before running in the background, make sure to run it once normally to be able to enter your Steam Guard codes (if needed).*
 
