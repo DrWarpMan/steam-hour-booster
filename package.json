@@ -27,15 +27,15 @@
     "@tsconfig/bun": "^1.0.7",
     "@tsconfig/strictest": "^2.0.5",
     "@types/steam-user": "^5.0.4",
-    "@types/bun": "^1.2.0"
+    "@types/bun": "^1.2.14"
   },
   "peerDependencies": {
-    "typescript": "^5.7.3"
+    "typescript": "^5.8.3"
   },
   "dependencies": {
     "p-retry": "^6.2.1",
     "pkg-dir": "^8.0.0",
-    "steam-user": "^5.2.0",
-    "zod": "^3.24.1"
+    "steam-user": "^5.2.3",
+    "zod": "^3.25.30"
   }
 }
