@@ -99,14 +99,15 @@ export class Bot {
 		const details = await this.#createLoginDetails();
 
 		this.#log("Prepared login credentials.");
-		
-		const {promise, resolve, reject} = Promise.withResolvers();
+
+		const { promise, resolve, reject } = Promise.withResolvers();
 
 		const loggedOnCallback = () => resolve();
 		const errorCallback = (err: unknown) => reject(err);
-		const timeout = setTimeout(() =>
-			reject(new Error("Login timed out."))
-		, LOGIN_TIMEOUT);
+		const timeout = setTimeout(
+			() => reject(new Error("Login timed out.")),
+			LOGIN_TIMEOUT,
+		);
 
 		const cleanup = () => {
 			clearTimeout(timeout);
@@ -121,7 +122,7 @@ export class Bot {
 		// Register the login callbacks
 		this.#steam.once("loggedOn", loggedOnCallback);
 		this.#steam.once("error", errorCallback);
-		
+
 		// Cleanup the callbacks & re-enable global error handling after the promise gets settled
 		promise.finally(() => cleanup());
 
@@ -138,7 +139,7 @@ export class Bot {
 	async logout(): Promise<void> {
 		this.#log("Logging out...");
 
-		const {promise, resolve} = Promise.withResolvers();
+		const { promise, resolve } = Promise.withResolvers();
 
 		this.#steam.once("disconnected", () => resolve());
 
