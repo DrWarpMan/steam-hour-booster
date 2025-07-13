@@ -5,6 +5,8 @@ import type { TokenStorage } from "./token-storage";
 
 type LoginDetails = Parameters<Steam["logOn"]>[0];
 
+const LOGIN_TIMEOUT = 30 * 1000;
+
 export class Bot {
 	#username: string;
 	#password: string;
@@ -95,25 +97,35 @@ export class Bot {
 		this.#log("Logging in...");
 
 		const details = await this.#createLoginDetails();
+
+		this.#log("Prepared login credentials.");
 		
 		const {promise, resolve, reject} = Promise.withResolvers();
 
 		const loggedOnCallback = () => resolve();
 		const errorCallback = (err: unknown) => reject(err);
+		const timeout = setTimeout(() =>
+			reject(new Error("Login timed out."))
+		, LOGIN_TIMEOUT);
 
-		// Register the callbacks & disable global error handling
-		this.#pauseErrors = true;
-		this.#steam.once("loggedOn", loggedOnCallback);
-		this.#steam.once("error", errorCallback);
-		
-		// Cleanup the callbacks & re-enable global error handling after the promise resolves
-		promise.finally(() => {
+		const cleanup = () => {
+			clearTimeout(timeout);
 			this.#steam.removeListener("loggedOn", loggedOnCallback);
 			this.#steam.removeListener("error", errorCallback);
 			this.#pauseErrors = false;
-		});
+		};
 
-		// Try to log in
+		// Temporarily disable global error handling
+		this.#pauseErrors = true;
+
+		// Register the login callbacks
+		this.#steam.once("loggedOn", loggedOnCallback);
+		this.#steam.once("error", errorCallback);
+		
+		// Cleanup the callbacks & re-enable global error handling after the promise gets settled
+		promise.finally(() => cleanup());
+
+		// Start login process
 		this.#steam.logOn(details);
 
 		await promise;
