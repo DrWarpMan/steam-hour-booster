@@ -104,13 +104,15 @@ export class Bot {
 
 		const loggedOnCallback = () => resolve();
 		const errorCallback = (err: unknown) => reject(err);
-		const timeout = setTimeout(
+		const loginTimeout = setTimeout(
 			() => reject(new Error("Login timed out.")),
 			LOGIN_TIMEOUT,
 		);
 
 		const cleanup = () => {
-			clearTimeout(timeout);
+			// Cleanup the callbacks & re-enable global error handling after the promise gets settled
+
+			clearTimeout(loginTimeout);
 			this.#steam.removeListener("loggedOn", loggedOnCallback);
 			this.#steam.removeListener("error", errorCallback);
 			this.#pauseErrors = false;
@@ -123,13 +125,14 @@ export class Bot {
 		this.#steam.once("loggedOn", loggedOnCallback);
 		this.#steam.once("error", errorCallback);
 
-		// Cleanup the callbacks & re-enable global error handling after the promise gets settled
-		promise.finally(() => cleanup());
-
 		// Start login process
-		this.#steam.logOn(details);
-
-		await promise;
+		try {
+			this.#steam.logOn(details);
+			
+			await promise;
+		} finally {
+			cleanup();
+		}
 
 		if (this.#online) {
 			this.#steam.setPersona(Steam.EPersonaState.Online);
