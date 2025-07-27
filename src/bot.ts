@@ -5,7 +5,7 @@ import type { TokenStorage } from "./token-storage";
 
 type LoginDetails = Parameters<Steam["logOn"]>[0];
 
-const LOGIN_TIMEOUT = 30 * 1000;
+const LOGIN_TIMEOUT = 5 * 60 * 1000;
 
 export class Bot {
 	#username: string;
