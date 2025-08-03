@@ -1,8 +1,10 @@
 import type { Bot } from "./bot";
 
+const MONITOR_PORT = Bun.env["MONITOR_PORT"] ?? 3000;
+
 export async function startMonitorApi(bots: Bot[]) {
 	Bun.serve({
-		port: 3000,
+		port: MONITOR_PORT,
 		async fetch(req) {
 			const url = new URL(req.url);
 
