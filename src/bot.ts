@@ -4,6 +4,7 @@ import { convertRelativePath } from "./path";
 import type { TokenStorage } from "./token-storage";
 
 type LoginDetails = Parameters<Steam["logOn"]>[0];
+type GameInfo = { appid: number; name: string };
 
 // To mitigate the following issue: https://github.com/DrWarpMan/steam-hour-booster/issues/9
 const LOGIN_TIMEOUT = 10 * 60 * 1000;
@@ -17,6 +18,7 @@ export class Bot {
 	#tokenStorage: TokenStorage | null;
 	#pauseErrors = false;
 	#blocked = false;
+	#startTime: Date | null = null;
 
 	constructor(
 		username: string,
@@ -39,6 +41,24 @@ export class Bot {
 		});
 
 		this.#setup();
+	}
+
+	async getSummary(): Promise<{
+		username: string;
+		status: string;
+		uptime: string;
+		blocked: boolean;
+		online: boolean;
+		games: GameInfo[];
+	}> {
+		return {
+			username: this.#username,
+			status: this.#getStatus(),
+			uptime: this.#getUptime(),
+			blocked: this.#blocked,
+			online: this.#online,
+			games: await this.#getConfiguredGames(),
+		};
 	}
 
 	#log(msg: string): void {
@@ -173,14 +193,72 @@ export class Bot {
 		};
 	}
 
-	#play() {
+	async #play() {
 		if (this.#blocked) {
 			this.#steam.gamesPlayed([]);
 			this.#log("Stopped playing.");
-		} else {
-			this.#steam.gamesPlayed(this.#games);
-			this.#log(`Playing ${this.#games.length} games.`);
+			this.#startTime = null;
+			return;
 		}
+	
+		this.#steam.gamesPlayed(this.#games);
+		this.#startTime = new Date();
+	
+		const configuredGames = await this.#getConfiguredGames();
+		const gameNames = configuredGames.map(game => game.name).join(", ");
+	
+		this.#log(`Playing ${this.#games.length} games.`);
+		this.#log(`Games: ${gameNames}`);
+		this.#log(`Started at: ${this.#startTime.toLocaleString()}`);
+	}
+
+	async #getConfiguredGames(): Promise<GameInfo[]> {
+		if (this.#games.length === 0) return [];
+	
+		return new Promise<GameInfo[]>((resolve, reject) => {
+			this.#steam.getProductInfo(this.#games, [], true, (err, apps) => {
+				if (err) {
+					reject(new Error(`Failed to fetch product info: ${err.message || err}`));
+					return;
+				}
+	
+				try {
+					const result: GameInfo[] = Object.values(apps).map(app => ({
+						appid: app.appinfo?.appid ?? 0,
+						name: app.appinfo?.common?.name ?? "Unknown",
+					}));
+	
+					resolve(result);
+				} catch (error) {
+					reject(new Error("Could not parse app names: " + (error instanceof Error ? error.message : String(error))));
+				}
+			});
+		});
+	}
+
+	#getUptime(): string {
+		if (!this.#startTime) return "Not currently playing.";
+	
+		const now = Date.now();
+		const start = this.#startTime.getTime();
+		const diff = now - start;
+	
+		const seconds = Math.floor((diff / 1000) % 60);
+		const minutes = Math.floor((diff / (1000 * 60)) % 60);
+		const hours = Math.floor(diff / (1000 * 60 * 60));
+	
+		const parts: string[] = [];
+		if (hours) parts.push(`${hours}h`);
+		if (minutes) parts.push(`${minutes}m`);
+		parts.push(`${seconds}s`);
+	
+		return parts.join(" ");
+	}
+	
+	#getStatus(): string {
+		if (!this.#startTime) return "Idle";
+		if (this.#blocked) return "Blocked";
+		return "Playing";
 	}
 
 	async #handleError(err: Error & { eresult: Steam.EResult }): Promise<void> {
