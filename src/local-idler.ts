@@ -82,7 +82,22 @@ export class LocalIdlerManager {
 	#compiledExePath: string | null = null;
 
 	constructor() {
-		// Find steam_api.dll
+		// 1. Try from .env / environment variable
+		const envPath =
+			Bun.env["STEAM_API_DLL_PATH"] ?? process.env["STEAM_API_DLL_PATH"];
+		if (envPath && fs.existsSync(envPath)) {
+			this.#dllPath = envPath;
+			return;
+		}
+
+		// 2. Try project root folder
+		const localRootDll = path.join(WORKSPACE_DIR, "steam_api.dll");
+		if (fs.existsSync(localRootDll)) {
+			this.#dllPath = localRootDll;
+			return;
+		}
+
+		// 3. Fallback to common candidate paths
 		for (const candidate of DLL_CANDIDATES) {
 			if (fs.existsSync(candidate)) {
 				this.#dllPath = candidate;

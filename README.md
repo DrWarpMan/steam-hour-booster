@@ -103,6 +103,7 @@ cp .env.example .env
 | `CONFIG_PATH` | Path to the config file | `./config.json` |
 | `STEAM_DATA_DIRECTORY` | Path to the directory where Steam will store it's data | `./steam-data` |
 | `TOKEN_STORAGE_DIRECTORY` | Path to the directory where Steam refresh tokens will be stored, used for remembering sessions | `./tokens` |
+| `STEAM_API_DLL_PATH` | Optional: Absolute/relative path to `steam_api.dll` | Project root folder, then system search |
 
 ## Docker
 
