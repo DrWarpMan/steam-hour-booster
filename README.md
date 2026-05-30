@@ -48,7 +48,7 @@ Configuration consists of a JSON file containing a list of accounts to farm hour
 Copy the default configuration:
 
 ```bash
-cp config-example.json config.json
+cp config.example.json config.json
 ```
 
 Edit the configuration file to your liking.
@@ -79,17 +79,14 @@ You can configure how your active gameplay is displayed to your friends by addin
 * **Option B: Manual Custom Status (String)**: Set `"CustomStatus": "Farming Hours..."`. This displays exactly your custom text to friends.
 * **Option C: Automatic Combined Lookup (`true`)**: Set `"CustomStatus": true`. The bot will automatically query Steam, fetch the official names of the AppIDs in your `"games"` array, concatenate them, and display them all to friends simultaneously (e.g. `Counter-Strike 2 & Rust & Dota 2`).
 
-> [!WARNING]
-> **Steam Chat Censorship (Stars Bypass)**: Steam automatically runs user-defined custom game status strings through keyword filters. Because these are treated as user text, words like `"Counter-Strike"` or `"PUBG"` get censored as asterisks (`*`) in friend chat. To bypass this and show restricted names without stars, use Cyrillic look-alike characters (homoglyphs) in your manual status string:
-> - Latin `o`, `e`, `a`, `c`, `p` ➡️ Cyrillic `о`, `е`, `а`, `с`, `р`
-> - Example: `"Cоuntеr-Strikе 2 & Rust"` (using Cyrillic `о` and `е`) will bypass the filter entirely!
+
 
 ## Environment variables
 You can provide a `.env` file to configure environment variables. You probably won't need to modify these.
 
 Copy the template:
 ```bash
-cp .env.template .env
+cp .env.example .env
 ```
 
 | Name | Description | Default value |

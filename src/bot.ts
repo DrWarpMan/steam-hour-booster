@@ -18,14 +18,6 @@ const askSteamGuardCodeAsync = (username: string): Promise<string> => {
 	});
 };
 
-/**
- * Bypasses Steam's keyword censorship filter by interspersing
- * Zero-Width Spaces (\u200B) between each character of the text.
- */
-const bypassCensorship = (text: string): string => {
-	return text.split("").join("\u200B");
-};
-
 type LoginDetails = Parameters<Steam["logOn"]>[0];
 
 // To mitigate the following issue: https://github.com/DrWarpMan/steam-hour-booster/issues/9
@@ -86,7 +78,7 @@ export class Bot {
 			}
 
 			if (typeof this.#customStatusConfig === "string") {
-				this.#customStatus = bypassCensorship(this.#customStatusConfig);
+				this.#customStatus = this.#customStatusConfig;
 				this.#log(`Using manual custom status: "${this.#customStatus}"`);
 				this.#play();
 				return;
@@ -104,6 +96,7 @@ export class Bot {
 					) => {
 						if (err) {
 							this.#log(`Failed to fetch product info: ${err.message}`);
+							this.#play();
 							return;
 						}
 
@@ -112,7 +105,7 @@ export class Bot {
 							for (const appid of this.#games) {
 								const app = apps[appid];
 								if (app?.appinfo?.common?.name) {
-									names.push(bypassCensorship(app.appinfo.common.name));
+									names.push(app.appinfo.common.name);
 								}
 							}
 
@@ -122,7 +115,13 @@ export class Bot {
 									`Automatic status constructed: "${this.#customStatus}"`,
 								);
 								this.#play();
+							} else {
+								this.#log("No game names could be resolved. Playing natively.");
+								this.#play();
 							}
+						} else {
+							this.#log("No apps returned from PICS. Playing natively.");
+							this.#play();
 						}
 					},
 				);
@@ -152,6 +151,14 @@ export class Bot {
 			}
 
 			this.#log(`Playing state changed: ${blocked} (App ID: ${playingApp})`);
+
+			// Defer play state until automatic status is constructed to prevent duplicate console logs/status flickering
+			if (this.#customStatusConfig === true && this.#customStatus === null) {
+				this.#log(
+					"Deferring play state until automatic status is constructed.",
+				);
+				return;
+			}
 
 			this.#play();
 		});
