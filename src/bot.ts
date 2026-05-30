@@ -34,6 +34,7 @@ export class Bot {
 	#blocked = false;
 	#customStatusConfig: string | boolean | undefined;
 	#customStatus: string | null = null;
+	#resolvingStatus = false;
 
 	constructor(
 		username: string,
@@ -73,19 +74,18 @@ export class Bot {
 				this.#customStatusConfig === false
 			) {
 				this.#log("CustomStatus is disabled (Native Status Mode).");
-				this.#play();
 				return;
 			}
 
 			if (typeof this.#customStatusConfig === "string") {
 				this.#customStatus = this.#customStatusConfig;
 				this.#log(`Using manual custom status: "${this.#customStatus}"`);
-				this.#play();
 				return;
 			}
 
 			if (this.#customStatusConfig === true) {
 				this.#log("Fetching automatic combined games status...");
+				this.#resolvingStatus = true;
 				this.#steam.getProductInfo(
 					this.#games,
 					[],
@@ -94,6 +94,7 @@ export class Bot {
 						err: Error | null,
 						apps: Record<number, { appinfo?: { common?: { name?: string } } }>,
 					) => {
+						this.#resolvingStatus = false;
 						if (err) {
 							this.#log(`Failed to fetch product info: ${err.message}`);
 							this.#play();
@@ -150,13 +151,17 @@ export class Bot {
 				return;
 			}
 
-			this.#log(`Playing state changed: ${blocked} (App ID: ${playingApp})`);
+			if (blocked) {
+				this.#log(
+					`Account is currently in-game elsewhere (App ID: ${playingApp}). Idling paused.`,
+				);
+			} else {
+				this.#log("No conflicting game sessions. Ready to idle.");
+			}
 
 			// Defer play state until automatic status is constructed to prevent duplicate console logs/status flickering
-			if (this.#customStatusConfig === true && this.#customStatus === null) {
-				this.#log(
-					"Deferring play state until automatic status is constructed.",
-				);
+			if (this.#resolvingStatus) {
+				this.#log("Fetching automatic custom status before starting...");
 				return;
 			}
 
