@@ -7,14 +7,6 @@ const WORKSPACE_DIR = process.cwd();
 const BIN_DIR = path.join(WORKSPACE_DIR, "bin");
 const TEMP_DIR = path.join(WORKSPACE_DIR, "temp");
 
-// Common locations to search for steam_api.dll
-const DLL_CANDIDATES = [
-	"D:\\SteamLibrary\\steamapps\\common\\Spacewar\\steam_api.dll",
-	"D:\\SteamLibrary\\steamapps\\common\\Company of Heroes Relaunch\\steam_api.dll",
-	"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Spacewar\\steam_api.dll",
-	"D:\\steamcmd\\steamapps\\common\\Spacewar\\steam_api.dll",
-];
-
 const CS_CODE = `using System;
 using System.Runtime.InteropServices;
 using System.IO;
@@ -95,14 +87,6 @@ export class LocalIdlerManager {
 		if (fs.existsSync(localRootDll)) {
 			this.#dllPath = localRootDll;
 			return;
-		}
-
-		// 3. Fallback to common candidate paths
-		for (const candidate of DLL_CANDIDATES) {
-			if (fs.existsSync(candidate)) {
-				this.#dllPath = candidate;
-				break;
-			}
 		}
 	}
 
