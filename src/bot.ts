@@ -1,7 +1,22 @@
-import pRetry from "p-retry";
+import readline from "node:readline";
+import pRetry, { AbortError } from "p-retry";
 import Steam, { EConnectionProtocol } from "steam-user";
 import { convertRelativePath } from "./path";
 import type { TokenStorage } from "./token-storage";
+
+const askSteamGuardCodeAsync = (username: string): Promise<string> => {
+	const rl = readline.createInterface({
+		input: process.stdin,
+		output: process.stdout,
+	});
+
+	return new Promise((resolve) => {
+		rl.question(`[${username}] Steam Guard code: `, (answer) => {
+			rl.close();
+			resolve(answer.trim());
+		});
+	});
+};
 
 type LoginDetails = Parameters<Steam["logOn"]>[0];
 
@@ -78,7 +93,7 @@ export class Bot {
 		});
 
 		this.#steam.on("steamGuard", async (_, callback) => {
-			const code = prompt(`[${this.#username}] Steam Guard code:`);
+			const code = await askSteamGuardCodeAsync(this.#username);
 
 			if (!code) {
 				console.error("No Steam Guard code provided, exiting.");
@@ -94,10 +109,10 @@ export class Bot {
 		});
 	}
 
-	async login(): Promise<void> {
+	async login(isFallback = false): Promise<void> {
 		this.#log("Logging in...");
 
-		const details = await this.#createLoginDetails();
+		const details = await this.#createLoginDetails(isFallback);
 
 		this.#log("Prepared login credentials.");
 
@@ -129,8 +144,24 @@ export class Bot {
 		// Start login process
 		try {
 			this.#steam.logOn(details);
-			
+
 			await promise;
+		} catch (err: unknown) {
+			const error = err as Error & { eresult?: Steam.EResult };
+			const isTokenError =
+				error.message?.includes("token") ||
+				error.eresult === Steam.EResult.Expired ||
+				error.eresult === Steam.EResult.InvalidPassword;
+
+			if (!isFallback && isTokenError && this.#tokenStorage) {
+				this.#log(
+					"Stored refresh token is invalid or expired. Deleting token and falling back to password...",
+				);
+				await this.#tokenStorage.deleteToken(this.#username);
+				return this.login(true);
+			}
+
+			throw err;
 		} finally {
 			cleanup();
 		}
@@ -152,12 +183,14 @@ export class Bot {
 		await promise;
 	}
 
-	async #createLoginDetails(): Promise<LoginDetails> {
+	async #createLoginDetails(bypassToken = false): Promise<LoginDetails> {
 		const details = {
 			renewRefreshTokens: true,
 		};
 
-		const token = await this.#tokenStorage?.getToken(this.#username);
+		const token = bypassToken
+			? null
+			: await this.#tokenStorage?.getToken(this.#username);
 
 		if (token) {
 			return {
@@ -183,8 +216,26 @@ export class Bot {
 		}
 	}
 
-	async #handleError(err: Error & { eresult: Steam.EResult }): Promise<void> {
+	async #handleError(err: Error & { eresult?: Steam.EResult }): Promise<void> {
 		console.error(err);
+
+		// List of EResults representing permanent account/session issues
+		const permanentFailures = [
+			Steam.EResult.InvalidPassword, // 5
+			Steam.EResult.AccountNotFound, // 18
+			Steam.EResult.AccountLogonDenied, // 63 (Invalid Steam Guard/2FA)
+			Steam.EResult.AccountLogonDeniedVerifiedEmailRequired, // 65
+			Steam.EResult.AccountLocked, // 73
+			Steam.EResult.RateLimitExceeded, // 84 (Flooding will make it worse!)
+		];
+
+		if (err.eresult && permanentFailures.includes(err.eresult)) {
+			this.#log(
+				`Permanent logon failure detected (${err.eresult}). Reconnect aborted.`,
+			);
+			this.#steam.logOff();
+			return;
+		}
 
 		try {
 			await this.logout();
@@ -193,6 +244,21 @@ export class Bot {
 				retries: 10,
 				factor: 2,
 				minTimeout: 10 * 1000,
+				onFailedAttempt: (error) => {
+					const retryErr = error as Error & { eresult?: Steam.EResult };
+					if (
+						retryErr.eresult &&
+						permanentFailures.includes(retryErr.eresult)
+					) {
+						this.#log(
+							`Abort retry due to permanent error: ${retryErr.eresult}`,
+						);
+						throw new AbortError(retryErr);
+					}
+					this.#log(
+						`Retrying logon due to network/transient issue. Attempt ${error.attemptNumber} failed.`,
+					);
+				},
 			});
 
 			this.#log("Re-login successful.");

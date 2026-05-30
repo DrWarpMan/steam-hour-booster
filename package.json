@@ -19,7 +19,12 @@
   ],
   "license": "MIT",
   "module": "src/index.ts",
-  "scripts": {},
+  "scripts": {
+    "start": "bun src/index.ts",
+    "dev": "bun --watch src/index.ts",
+    "lint": "biome check src",
+    "format": "biome format --write src"
+  },
   "type": "module",
   "devDependencies": {
     "@biomejs/biome": "1.9.4",

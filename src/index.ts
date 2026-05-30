@@ -1,3 +1,4 @@
+import { join } from "node:path";
 import { Bot } from "./bot";
 import { loadConfig } from "./config";
 import { DefaultTokenStorage } from "./token-storage";
@@ -12,11 +13,16 @@ const config = await loadConfig(configPath);
 const ts = new DefaultTokenStorage(tokenStorageDir);
 
 for (const entry of config) {
+	const accountDataDirectory = join(
+		steamDataDirectory,
+		entry.username.toLowerCase(),
+	);
+
 	const bot = new Bot(
 		entry.username,
 		entry.password,
 		entry.games,
-		steamDataDirectory,
+		accountDataDirectory,
 		ts,
 		entry.online,
 	);
