@@ -1,7 +1,7 @@
 import readline from "node:readline";
 import pRetry, { AbortError } from "p-retry";
 import Steam, { EConnectionProtocol } from "steam-user";
-import { LocalIdlerManager, isLocalSteamRunning } from "./local-idler";
+import { LocalIdlerManager } from "./local-idler";
 import { convertRelativePath } from "./path";
 import type { TokenStorage } from "./token-storage";
 
@@ -37,7 +37,6 @@ export class Bot {
 	#customStatus: string | null = null;
 	#resolvingStatus = false;
 	#localIdler: LocalIdlerManager | null = null;
-	#localMode = false;
 
 	constructor(
 		username: string,
@@ -205,16 +204,6 @@ export class Bot {
 	async login(isFallback = false): Promise<void> {
 		this.#log("Logging in...");
 
-		// Detect if local Steam client is running to avoid session disconnections
-		if (isLocalSteamRunning()) {
-			this.#log(
-				"Local Steam client detected. Skipping network login to prevent session conflict.",
-			);
-			this.#localMode = true;
-			this.#localIdler?.startIdling(this.#games);
-			return;
-		}
-
 		const details = await this.#createLoginDetails(isFallback);
 
 		this.#log("Prepared login credentials.");
@@ -325,15 +314,20 @@ export class Bot {
 				? ([this.#customStatus, ...this.#games] as (string | number)[])
 				: this.#games;
 
-			this.#steam.gamesPlayed(playList);
-			if (this.#localMode) {
-				this.#localIdler?.startIdling(this.#games);
-			}
-			this.#log(
-				`Playing ${this.#games.length} games (Display: "${
-					hasCustomStatus ? this.#customStatus : this.#games[0]
-				}").`,
-			);
+			// 1. Start the local idlers first so they register in your PC Steam client sidebar
+			this.#localIdler?.startIdling(this.#games);
+
+			// 2. Delay the TCP gamesPlayed command by 2 seconds so it lands last on Steam's servers and overrides the display status
+			setTimeout(() => {
+				if (!this.#blocked) {
+					this.#steam.gamesPlayed(playList);
+					this.#log(
+						`Playing ${this.#games.length} games (Display: "${
+							hasCustomStatus ? this.#customStatus : this.#games[0]
+						}").`,
+					);
+				}
+			}, 2000);
 		}
 	}
 
