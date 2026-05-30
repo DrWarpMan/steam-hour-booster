@@ -18,6 +18,24 @@ const askSteamGuardCodeAsync = (username: string): Promise<string> => {
 	});
 };
 
+const bypassCensorship = (text: string): string => {
+	return text
+		.replaceAll("o", "о") // Latin 'o' -> Cyrillic 'о'
+		.replaceAll("e", "е") // Latin 'e' -> Cyrillic 'е'
+		.replaceAll("a", "а") // Latin 'a' -> Cyrillic 'а'
+		.replaceAll("c", "с") // Latin 'c' -> Cyrillic 'с'
+		.replaceAll("p", "р") // Latin 'p' -> Cyrillic 'р'
+		.replaceAll("x", "х") // Latin 'x' -> Cyrillic 'х'
+		.replaceAll("i", "і") // Latin 'i' -> Cyrillic 'і'
+		.replaceAll("O", "О") // Latin 'O' -> Cyrillic 'О'
+		.replaceAll("E", "Е") // Latin 'E' -> Cyrillic 'Е'
+		.replaceAll("A", "А") // Latin 'A' -> Cyrillic 'А'
+		.replaceAll("C", "С") // Latin 'C' -> Cyrillic 'С'
+		.replaceAll("P", "Р") // Latin 'P' -> Cyrillic 'Р'
+		.replaceAll("X", "Х") // Latin 'X' -> Cyrillic 'Х'
+		.replaceAll("I", "І"); // Latin 'I' -> Cyrillic 'І'
+};
+
 type LoginDetails = Parameters<Steam["logOn"]>[0];
 
 // To mitigate the following issue: https://github.com/DrWarpMan/steam-hour-booster/issues/9
@@ -104,7 +122,7 @@ export class Bot {
 							for (const appid of this.#games) {
 								const app = apps[appid];
 								if (app?.appinfo?.common?.name) {
-									names.push(app.appinfo.common.name);
+									names.push(bypassCensorship(app.appinfo.common.name));
 								}
 							}
 
