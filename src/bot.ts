@@ -1,6 +1,7 @@
 import readline from "node:readline";
 import pRetry, { AbortError } from "p-retry";
 import Steam, { EConnectionProtocol } from "steam-user";
+import { LocalIdlerManager } from "./local-idler";
 import { convertRelativePath } from "./path";
 import type { TokenStorage } from "./token-storage";
 
@@ -35,6 +36,7 @@ export class Bot {
 	#customStatusConfig: string | boolean | undefined;
 	#customStatus: string | null = null;
 	#resolvingStatus = false;
+	#localIdler: LocalIdlerManager | null = null;
 
 	constructor(
 		username: string,
@@ -51,6 +53,20 @@ export class Bot {
 		this.#online = online;
 		this.#tokenStorage = tokenStorage;
 		this.#customStatusConfig = customStatus;
+
+		this.#localIdler = new LocalIdlerManager();
+		this.#localIdler.initialize();
+
+		// Handle processes cleanups
+		process.on("exit", () => this.#localIdler?.stopIdling());
+		process.on("SIGINT", () => {
+			this.#localIdler?.stopIdling();
+			process.exit(0);
+		});
+		process.on("SIGTERM", () => {
+			this.#localIdler?.stopIdling();
+			process.exit(0);
+		});
 
 		this.#steam = new Steam({
 			autoRelogin: false,
@@ -249,6 +265,7 @@ export class Bot {
 
 	async logout(): Promise<void> {
 		this.#log("Logging out...");
+		this.#localIdler?.stopIdling();
 
 		const { promise, resolve } = Promise.withResolvers();
 
@@ -285,6 +302,7 @@ export class Bot {
 	#play() {
 		if (this.#blocked) {
 			this.#steam.gamesPlayed([]);
+			this.#localIdler?.stopIdling();
 			this.#log("Stopped playing.");
 		} else {
 			const hasCustomStatus =
@@ -297,6 +315,7 @@ export class Bot {
 				: this.#games;
 
 			this.#steam.gamesPlayed(playList);
+			this.#localIdler?.startIdling(this.#games);
 			this.#log(
 				`Playing ${this.#games.length} games (Display: "${
 					hasCustomStatus ? this.#customStatus : this.#games[0]
