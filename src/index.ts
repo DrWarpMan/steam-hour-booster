@@ -25,6 +25,7 @@ for (const entry of config) {
 		accountDataDirectory,
 		ts,
 		entry.online,
+		entry.CustomStatus,
 	);
 
 	await bot.login();
