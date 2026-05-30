@@ -1,7 +1,7 @@
 import readline from "node:readline";
 import pRetry, { AbortError } from "p-retry";
 import Steam, { EConnectionProtocol } from "steam-user";
-import { LocalIdlerManager } from "./local-idler";
+import { LocalIdlerManager, isLocalSteamRunning } from "./local-idler";
 import { convertRelativePath } from "./path";
 import type { TokenStorage } from "./token-storage";
 
@@ -37,6 +37,7 @@ export class Bot {
 	#customStatus: string | null = null;
 	#resolvingStatus = false;
 	#localIdler: LocalIdlerManager | null = null;
+	#localMode = false;
 
 	constructor(
 		username: string,
@@ -206,6 +207,21 @@ export class Bot {
 	}
 
 	async login(isFallback = false): Promise<void> {
+		// Check if local Steam client is running
+		if (isLocalSteamRunning()) {
+			this.#localMode = true;
+			this.#log(
+				"Local Steam client detected. Running in LOCAL MODE (no network login).",
+			);
+			this.#log(
+				'Games will show as "Running" in your Steam sidebar. Custom status is not available in this mode.',
+			);
+			this.#play();
+			return;
+		}
+
+		// Remote mode — full TCP login
+		this.#localMode = false;
 		this.#log("Logging in...");
 
 		const details = await this.#createLoginDetails(isFallback);
@@ -308,31 +324,32 @@ export class Bot {
 			this.#steam.gamesPlayed([]);
 			this.#localIdler?.stopIdling();
 			this.#log("Stopped playing.");
-		} else {
-			const hasCustomStatus =
-				this.#customStatusConfig !== undefined &&
-				this.#customStatusConfig !== false &&
-				this.#customStatus !== null;
-
-			const playList = hasCustomStatus
-				? ([this.#customStatus, ...this.#games] as (string | number)[])
-				: this.#games;
-
-			// 1. Start the local idlers first so they register in your PC Steam client sidebar
-			this.#localIdler?.startIdling(this.#games);
-
-			// 2. Delay the TCP gamesPlayed command by 2 seconds so it lands last on Steam's servers and overrides the display status
-			setTimeout(() => {
-				if (!this.#blocked) {
-					this.#steam.gamesPlayed(playList);
-					this.#log(
-						`Playing ${this.#games.length} games (Display: "${
-							hasCustomStatus ? this.#customStatus : this.#games[0]
-						}").`,
-					);
-				}
-			}, 2000);
+			return;
 		}
+
+		// LOCAL MODE: Only run local C# idlers (no TCP, no session conflict)
+		if (this.#localMode) {
+			this.#localIdler?.startIdling(this.#games);
+			this.#log(`Idling ${this.#games.length} games via local Steam client.`);
+			return;
+		}
+
+		// REMOTE MODE: Only use TCP gamesPlayed (no local idlers)
+		const hasCustomStatus =
+			this.#customStatusConfig !== undefined &&
+			this.#customStatusConfig !== false &&
+			this.#customStatus !== null;
+
+		const playList = hasCustomStatus
+			? ([this.#customStatus, ...this.#games] as (string | number)[])
+			: this.#games;
+
+		this.#steam.gamesPlayed(playList);
+		this.#log(
+			`Playing ${this.#games.length} games (Display: "${
+				hasCustomStatus ? this.#customStatus : this.#games[0]
+			}").`,
+		);
 	}
 
 	async #handleError(err: Error & { eresult?: Steam.EResult }): Promise<void> {
