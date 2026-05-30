@@ -8,14 +8,6 @@
 
 ![Result of hours farming](./result.png)
 
-## Table of contents
-- [Requirements](#requirements)
-- [Usage](#usage)
-- [Configuration](#configuration)
-- [Environment variables](#environment-variables)
-- [Docker](#docker)
-- [FAQ](#faq)
-
 ## Requirements
 - [Bun](https://bun.sh/) (or [Docker](https://www.docker.com/))
 
@@ -43,8 +35,6 @@ I recommend using [Docker](#docker) to achieve this, but you are free to use you
 
 ## Configuration
 
-Configuration consists of a JSON file containing a list of accounts to farm hours on.
-
 Copy the default configuration:
 
 ```bash
@@ -60,26 +50,45 @@ Edit the configuration file to your liking.
     {
         "username": "foo",
         "password": "bar",
-        "games": [730]
+        "games": [730, 252490, 578080],
+        "online": true,
+        "CustomStatus": "gg",
+        "forceStatus": false
     }
 ]
 ```
 
 You can add as many accounts as you want.
 
-The `games` array contains the IDs of the games you want to farm hours for. Game IDs can be found on [SteamDB](https://steamdb.info/).\
-You can play up to **32** games at the same time on a single account.
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `username` | `string` | — | Steam account username |
+| `password` | `string` | — | Steam account password |
+| `games` | `number[]` | — | Array of [Steam App IDs](https://steamdb.info/) to farm (max 32) |
+| `online` | `boolean` | `false` | Appear online & in-game while farming |
+| `CustomStatus` | `string \| boolean` | — | Custom playing status (see below) |
+| `forceStatus` | `boolean` | `false` | Force custom status even when Steam client is open (see below) |
 
-You can also add `"online": true` to make the account appear online & in-game while farming hours. This is disabled by default.
+### Custom Playing Status
 
-### Custom Playing Status (Consolidated Display)
-You can configure how your active gameplay is displayed to your friends by adding `"CustomStatus"` to your account configuration. Note that `"online": true` **must** be set, otherwise your status will remain Offline/Invisible and friends will see nothing.
+| Value | Behavior |
+| --- | --- |
+| *omitted* or `false` | Native display — shows the first game in your list (e.g. `In-Game: Counter-Strike 2`) |
+| `"gg"` (any string) | Shows your custom text to friends |
+| `true` | Auto-fetches game names and combines them (e.g. `Counter-Strike 2 & Rust & PUBG`) |
 
-* **Option A: Native Display (Default / Omitted)**: If `"CustomStatus"` is omitted or set to `false`, your friends list will show you playing the **first game** in your `"games"` array natively (e.g. `In-Game: Counter-Strike 2` in rich green). This is completely uncensored (no stars) and highlights all your idling games as actively **"Running"** in your local Steam library frontend!
-* **Option B: Manual Custom Status (String)**: Set `"CustomStatus": "Farming Hours..."`. This displays exactly your custom text to friends.
-* **Option C: Automatic Combined Lookup (`true`)**: Set `"CustomStatus": true`. The bot will automatically query Steam, fetch the official names of the AppIDs in your `"games"` array, concatenate them, and display them all to friends simultaneously (e.g. `Counter-Strike 2 & Rust & Dota 2`).
+> **Note:** `"online": true` must be set, otherwise your status will remain Offline/Invisible.
 
+### Auto Mode vs Force Mode
 
+The bot automatically detects if your local Steam client is running:
+
+| | Steam client **open** | Steam client **closed** |
+| --- | --- | --- |
+| **Default** (`forceStatus: false`) | Local mode — games show **"Running"** in your sidebar, no custom status | Remote mode — custom status shown to friends |
+| **Force** (`forceStatus: true`) | Forces TCP login — custom status shown, local idlers disabled | Remote mode — same behavior |
+
+> **Warning:** When `forceStatus` is enabled and Steam client is open, your PC Steam session may show a `LoggedInElsewhere` prompt. This is expected — the bot takes over the session to display your custom status.
 
 ## Environment variables
 You can provide a `.env` file to configure environment variables. You probably won't need to modify these.

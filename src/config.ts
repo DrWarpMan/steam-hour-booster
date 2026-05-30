@@ -11,6 +11,7 @@ export const configSchema = z.array(
 		games: z.array(z.number().int().positive()).min(1).max(32),
 		online: z.boolean().default(false),
 		CustomStatus: z.union([z.string(), z.boolean()]).optional(),
+		forceStatus: z.boolean().default(false),
 	}),
 );
 

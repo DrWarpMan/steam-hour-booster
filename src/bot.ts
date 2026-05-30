@@ -38,6 +38,7 @@ export class Bot {
 	#resolvingStatus = false;
 	#localIdler: LocalIdlerManager | null = null;
 	#localMode = false;
+	#forceStatus: boolean;
 
 	constructor(
 		username: string,
@@ -47,6 +48,7 @@ export class Bot {
 		tokenStorage: TokenStorage | null = null,
 		online = false,
 		customStatus: string | boolean | undefined = undefined,
+		forceStatus = false,
 	) {
 		this.#username = username.toLowerCase();
 		this.#password = password;
@@ -54,6 +56,7 @@ export class Bot {
 		this.#online = online;
 		this.#tokenStorage = tokenStorage;
 		this.#customStatusConfig = customStatus;
+		this.#forceStatus = forceStatus;
 
 		this.#localIdler = new LocalIdlerManager();
 		this.#localIdler.initialize();
@@ -208,7 +211,7 @@ export class Bot {
 
 	async login(isFallback = false): Promise<void> {
 		// Check if local Steam client is running
-		if (isLocalSteamRunning()) {
+		if (isLocalSteamRunning() && !this.#forceStatus) {
 			this.#localMode = true;
 			this.#log(
 				"Local Steam client detected. Running in LOCAL MODE (no network login).",
@@ -218,6 +221,12 @@ export class Bot {
 			);
 			this.#play();
 			return;
+		}
+
+		if (this.#forceStatus && isLocalSteamRunning()) {
+			this.#log(
+				"Force Status enabled. Bypassing local mode — using TCP login for custom status.",
+			);
 		}
 
 		// Remote mode — full TCP login

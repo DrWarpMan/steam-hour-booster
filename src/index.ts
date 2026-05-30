@@ -26,6 +26,7 @@ for (const entry of config) {
 		ts,
 		entry.online,
 		entry.CustomStatus,
+		entry.forceStatus,
 	);
 
 	await bot.login();
