@@ -338,6 +338,15 @@ export class Bot {
 	async #handleError(err: Error & { eresult?: Steam.EResult }): Promise<void> {
 		console.error(err);
 
+		if (err.eresult === Steam.EResult.LoggedInElsewhere) {
+			this.#log(
+				"You are active on your PC Steam client. Bot session paused to prevent disconnections.",
+			);
+			this.#steam.logOff();
+			this.#localIdler?.stopIdling();
+			return;
+		}
+
 		// List of EResults representing permanent account/session issues
 		const permanentFailures = [
 			Steam.EResult.InvalidPassword, // 5
