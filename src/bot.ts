@@ -32,6 +32,7 @@ export class Bot {
 	#tokenStorage: TokenStorage | null;
 	#pauseErrors = false;
 	#blocked = false;
+	#customStatus: string | null = null;
 
 	constructor(
 		username: string,
@@ -63,6 +64,39 @@ export class Bot {
 	#setup(): void {
 		this.#steam.on("loggedOn", () => {
 			this.#log("Logged in.");
+
+			this.#steam.getProductInfo(
+				this.#games,
+				[],
+				false,
+				(
+					err: Error | null,
+					apps: Record<number, { appinfo?: { common?: { name?: string } } }>,
+				) => {
+					if (err) {
+						this.#log(`Failed to fetch product info: ${err.message}`);
+						return;
+					}
+
+					if (apps) {
+						const names: string[] = [];
+						for (const appid of this.#games) {
+							const app = apps[appid];
+							if (app?.appinfo?.common?.name) {
+								names.push(app.appinfo.common.name);
+							}
+						}
+
+						if (names.length > 0) {
+							this.#customStatus = names.join(" & ");
+							this.#log(
+								`Automatic status constructed: "${this.#customStatus}"`,
+							);
+							this.#play();
+						}
+					}
+				},
+			);
 		});
 
 		this.#steam.on("disconnected", (eresult, msg) => {
@@ -211,8 +245,15 @@ export class Bot {
 			this.#steam.gamesPlayed([]);
 			this.#log("Stopped playing.");
 		} else {
-			this.#steam.gamesPlayed(this.#games);
-			this.#log(`Playing ${this.#games.length} games.`);
+			const playList = this.#customStatus
+				? ([this.#customStatus, ...this.#games] as (string | number)[])
+				: this.#games;
+			this.#steam.gamesPlayed(playList);
+			this.#log(
+				`Playing ${this.#games.length} games (Display: "${
+					this.#customStatus || this.#games[0]
+				}").`,
+			);
 		}
 	}
 
