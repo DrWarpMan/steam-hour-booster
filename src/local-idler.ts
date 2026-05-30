@@ -225,3 +225,17 @@ export class LocalIdlerManager {
 		} catch {}
 	}
 }
+
+export function isLocalSteamRunning(): boolean {
+	if (process.platform !== "win32") {
+		return false;
+	}
+	try {
+		const output = execSync('tasklist /FI "IMAGENAME eq steam.exe" /NH', {
+			stdio: "pipe",
+		}).toString();
+		return output.toLowerCase().includes("steam.exe");
+	} catch {
+		return false;
+	}
+}

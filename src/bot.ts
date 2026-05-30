@@ -1,7 +1,7 @@
 import readline from "node:readline";
 import pRetry, { AbortError } from "p-retry";
 import Steam, { EConnectionProtocol } from "steam-user";
-import { LocalIdlerManager } from "./local-idler";
+import { LocalIdlerManager, isLocalSteamRunning } from "./local-idler";
 import { convertRelativePath } from "./path";
 import type { TokenStorage } from "./token-storage";
 
@@ -203,6 +203,15 @@ export class Bot {
 
 	async login(isFallback = false): Promise<void> {
 		this.#log("Logging in...");
+
+		// Detect if local Steam client is running to avoid session disconnections
+		if (isLocalSteamRunning()) {
+			this.#log(
+				"Local Steam client detected. Skipping network login to prevent session conflict.",
+			);
+			this.#localIdler?.startIdling(this.#games);
+			return;
+		}
 
 		const details = await this.#createLoginDetails(isFallback);
 
