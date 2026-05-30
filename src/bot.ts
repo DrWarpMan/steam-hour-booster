@@ -160,14 +160,18 @@ export class Bot {
 		});
 
 		this.#steam.on("playingState", (blocked, playingApp) => {
-			this.#blocked = blocked;
+			// Ignore blocks caused by our own idled games
+			const isOwnGame = this.#games.includes(playingApp);
+			const realBlocked = blocked && !isOwnGame;
+
+			this.#blocked = realBlocked;
 
 			// If we're not blocked & we are already playing something
-			if (!blocked && playingApp !== 0) {
+			if (!realBlocked && playingApp !== 0) {
 				return;
 			}
 
-			if (blocked) {
+			if (realBlocked) {
 				this.#log(
 					`Account is currently in-game elsewhere (App ID: ${playingApp}). Idling paused.`,
 				);
