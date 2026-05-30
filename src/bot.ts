@@ -19,52 +19,30 @@ const askSteamGuardCodeAsync = (username: string): Promise<string> => {
 };
 
 const HOMOGLYPH_MAP: Record<string, string> = {
-	// Lowercase letters
+	// Lowercase perfect homoglyphs (visibly identical)
 	a: "а", // Cyrillic small a
-	b: "Ь", // Cyrillic small soft sign (close match)
 	c: "с", // Cyrillic small es
-	d: "ԁ", // Cyrillic small dzhani
 	e: "е", // Cyrillic small ie
-	g: "ɡ", // Latin small letter script g
-	h: "һ", // Cyrillic small shha
-	i: "і", // Cyrillic small byelorussian-ukrainian i
-	j: "ј", // Cyrillic small je
-	k: "κ", // Greek small kappa
-	l: "ӏ", // Cyrillic palochka
-	m: "м", // Cyrillic small em
-	n: "ո", // Armenian small vo
 	o: "о", // Cyrillic small o
 	p: "р", // Cyrillic small er
-	q: "ԛ", // Cyrillic small qa
-	s: "ѕ", // Cyrillic small dze
-	t: "т", // Cyrillic small te
-	u: "υ", // Greek small upsilon
-	v: "ν", // Greek small nu
-	w: "ԝ", // Cyrillic small we
-	x: "х", // Cyrillic small ha
 	y: "у", // Cyrillic small u
-	z: "ᴢ", // Latin small capital z
 
-	// Uppercase letters
+	// Uppercase perfect homoglyphs (visibly identical)
 	A: "А", // Cyrillic capital A
-	B: "В", // Cyrillic capital Ve
+	B: "В", // Cyrillic capital Ve (looks exactly like B)
 	C: "С", // Cyrillic capital Es
 	E: "Е", // Cyrillic capital Ie
-	H: "Н", // Cyrillic capital En
+	H: "Н", // Cyrillic capital En (looks exactly like H)
 	I: "І", // Cyrillic capital Byelorussian-Ukrainian I
 	J: "Ј", // Cyrillic capital Je
-	K: "К", // Cyrillic capital Ka
-	M: "М", // Cyrillic capital Em
-	N: "Ν", // Greek capital Nu
+	K: "К", // Cyrillic capital Ka (looks exactly like K)
+	M: "М", // Cyrillic capital Em (looks exactly like M)
 	O: "О", // Cyrillic capital O
-	P: "Р", // Cyrillic capital Er
-	S: "Ѕ", // Cyrillic capital Dze
-	T: "Т", // Cyrillic capital Te
-	V: "Ѵ", // Cyrillic capital Izhitsa
-	W: "Ԝ", // Cyrillic capital We
+	P: "Р", // Cyrillic capital Er (looks exactly like P)
+	S: "Ѕ", // Cyrillic capital Dze (looks exactly like S)
+	T: "Т", // Cyrillic capital Te (looks exactly like T)
 	X: "Х", // Cyrillic capital Ha
-	Y: "Ү", // Cyrillic capital Ue
-	Z: "Ζ", // Greek capital Zeta
+	Y: "Ү", // Cyrillic capital Ue (looks exactly like Y)
 };
 
 /**
