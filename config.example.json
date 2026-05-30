@@ -1,0 +1,9 @@
+[
+    {
+        "username": "steamusername",
+        "password": "password",
+        "games": [730],
+        "online": true,
+        "CustomStatus": true
+    }
+]

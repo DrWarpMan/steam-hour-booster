@@ -18,39 +18,12 @@ const askSteamGuardCodeAsync = (username: string): Promise<string> => {
 	});
 };
 
-const HOMOGLYPH_MAP: Record<string, string> = {
-	// Lowercase perfect homoglyphs (visibly identical)
-	a: "а", // Cyrillic small a
-	c: "с", // Cyrillic small es
-	e: "е", // Cyrillic small ie
-	o: "о", // Cyrillic small o
-	p: "р", // Cyrillic small er
-	y: "у", // Cyrillic small u
-
-	// Uppercase perfect homoglyphs (visibly identical)
-	A: "А", // Cyrillic capital A
-	B: "В", // Cyrillic capital Ve (looks exactly like B)
-	C: "С", // Cyrillic capital Es
-	E: "Е", // Cyrillic capital Ie
-	H: "Н", // Cyrillic capital En (looks exactly like H)
-	I: "І", // Cyrillic capital Byelorussian-Ukrainian I
-	J: "Ј", // Cyrillic capital Je
-	K: "К", // Cyrillic capital Ka (looks exactly like K)
-	M: "М", // Cyrillic capital Em (looks exactly like M)
-	O: "О", // Cyrillic capital O
-	P: "Р", // Cyrillic capital Er (looks exactly like P)
-	S: "Ѕ", // Cyrillic capital Dze (looks exactly like S)
-	T: "Т", // Cyrillic capital Te (looks exactly like T)
-	X: "Х", // Cyrillic capital Ha
-	Y: "Ү", // Cyrillic capital Ue (looks exactly like Y)
-};
-
 /**
- * Bypasses basic string filters by replacing Latin characters
- * with visually indistinguishable Unicode homoglyphs.
+ * Bypasses Steam's keyword censorship filter by interspersing
+ * Zero-Width Spaces (\u200B) between each character of the text.
  */
 const bypassCensorship = (text: string): string => {
-	return text.replace(/[a-zA-Z]/g, (char) => HOMOGLYPH_MAP[char] || char);
+	return text.split("").join("\u200B");
 };
 
 type LoginDetails = Parameters<Steam["logOn"]>[0];
@@ -113,7 +86,7 @@ export class Bot {
 			}
 
 			if (typeof this.#customStatusConfig === "string") {
-				this.#customStatus = this.#customStatusConfig;
+				this.#customStatus = bypassCensorship(this.#customStatusConfig);
 				this.#log(`Using manual custom status: "${this.#customStatus}"`);
 				this.#play();
 				return;
