@@ -104,6 +104,7 @@ cp .env.example .env
 | `STEAM_DATA_DIRECTORY` | Path to the directory where Steam will store it's data | `./steam-data` |
 | `TOKEN_STORAGE_DIRECTORY` | Path to the directory where Steam refresh tokens will be stored, used for remembering sessions | `./tokens` |
 | `STEAM_API_DLL_PATH` | Optional: Absolute/relative path to `steam_api.dll` | Project root folder, then system search |
+| `BIN_DIRECTORY` | Optional: Path to custom bin directory for compiled C# helper | `./bin` |
 
 ## Docker
 

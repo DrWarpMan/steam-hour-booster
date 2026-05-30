@@ -4,7 +4,10 @@ import path from "node:path";
 
 const CSC_PATH = "C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\csc.exe";
 const WORKSPACE_DIR = process.cwd();
-const BIN_DIR = path.join(WORKSPACE_DIR, "bin");
+const envBinDir = Bun.env["BIN_DIRECTORY"] ?? process.env["BIN_DIRECTORY"];
+const BIN_DIR = envBinDir
+	? path.resolve(WORKSPACE_DIR, envBinDir)
+	: path.join(WORKSPACE_DIR, "bin");
 const TEMP_DIR = path.join(WORKSPACE_DIR, "temp");
 
 const CS_CODE = `using System;
