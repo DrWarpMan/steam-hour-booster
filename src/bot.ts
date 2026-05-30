@@ -37,6 +37,7 @@ export class Bot {
 	#customStatus: string | null = null;
 	#resolvingStatus = false;
 	#localIdler: LocalIdlerManager | null = null;
+	#localMode = false;
 
 	constructor(
 		username: string,
@@ -209,6 +210,7 @@ export class Bot {
 			this.#log(
 				"Local Steam client detected. Skipping network login to prevent session conflict.",
 			);
+			this.#localMode = true;
 			this.#localIdler?.startIdling(this.#games);
 			return;
 		}
@@ -324,7 +326,9 @@ export class Bot {
 				: this.#games;
 
 			this.#steam.gamesPlayed(playList);
-			this.#localIdler?.startIdling(this.#games);
+			if (this.#localMode) {
+				this.#localIdler?.startIdling(this.#games);
+			}
 			this.#log(
 				`Playing ${this.#games.length} games (Display: "${
 					hasCustomStatus ? this.#customStatus : this.#games[0]
