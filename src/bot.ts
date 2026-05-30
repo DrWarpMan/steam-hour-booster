@@ -18,22 +18,61 @@ const askSteamGuardCodeAsync = (username: string): Promise<string> => {
 	});
 };
 
+const HOMOGLYPH_MAP: Record<string, string> = {
+	// Lowercase letters
+	a: "а", // Cyrillic small a
+	b: "Ь", // Cyrillic small soft sign (close match)
+	c: "с", // Cyrillic small es
+	d: "ԁ", // Cyrillic small dzhani
+	e: "е", // Cyrillic small ie
+	g: "ɡ", // Latin small letter script g
+	h: "һ", // Cyrillic small shha
+	i: "і", // Cyrillic small byelorussian-ukrainian i
+	j: "ј", // Cyrillic small je
+	k: "κ", // Greek small kappa
+	l: "ӏ", // Cyrillic palochka
+	m: "м", // Cyrillic small em
+	n: "ո", // Armenian small vo
+	o: "о", // Cyrillic small o
+	p: "р", // Cyrillic small er
+	q: "ԛ", // Cyrillic small qa
+	s: "ѕ", // Cyrillic small dze
+	t: "т", // Cyrillic small te
+	u: "υ", // Greek small upsilon
+	v: "ν", // Greek small nu
+	w: "ԝ", // Cyrillic small we
+	x: "х", // Cyrillic small ha
+	y: "у", // Cyrillic small u
+	z: "ᴢ", // Latin small capital z
+
+	// Uppercase letters
+	A: "А", // Cyrillic capital A
+	B: "В", // Cyrillic capital Ve
+	C: "С", // Cyrillic capital Es
+	E: "Е", // Cyrillic capital Ie
+	H: "Н", // Cyrillic capital En
+	I: "І", // Cyrillic capital Byelorussian-Ukrainian I
+	J: "Ј", // Cyrillic capital Je
+	K: "К", // Cyrillic capital Ka
+	M: "М", // Cyrillic capital Em
+	N: "Ν", // Greek capital Nu
+	O: "О", // Cyrillic capital O
+	P: "Р", // Cyrillic capital Er
+	S: "Ѕ", // Cyrillic capital Dze
+	T: "Т", // Cyrillic capital Te
+	V: "Ѵ", // Cyrillic capital Izhitsa
+	W: "Ԝ", // Cyrillic capital We
+	X: "Х", // Cyrillic capital Ha
+	Y: "Ү", // Cyrillic capital Ue
+	Z: "Ζ", // Greek capital Zeta
+};
+
+/**
+ * Bypasses basic string filters by replacing Latin characters
+ * with visually indistinguishable Unicode homoglyphs.
+ */
 const bypassCensorship = (text: string): string => {
-	return text
-		.replaceAll("o", "о") // Latin 'o' -> Cyrillic 'о'
-		.replaceAll("e", "е") // Latin 'e' -> Cyrillic 'е'
-		.replaceAll("a", "а") // Latin 'a' -> Cyrillic 'а'
-		.replaceAll("c", "с") // Latin 'c' -> Cyrillic 'с'
-		.replaceAll("p", "р") // Latin 'p' -> Cyrillic 'р'
-		.replaceAll("x", "х") // Latin 'x' -> Cyrillic 'х'
-		.replaceAll("i", "і") // Latin 'i' -> Cyrillic 'і'
-		.replaceAll("O", "О") // Latin 'O' -> Cyrillic 'О'
-		.replaceAll("E", "Е") // Latin 'E' -> Cyrillic 'Е'
-		.replaceAll("A", "А") // Latin 'A' -> Cyrillic 'А'
-		.replaceAll("C", "С") // Latin 'C' -> Cyrillic 'С'
-		.replaceAll("P", "Р") // Latin 'P' -> Cyrillic 'Р'
-		.replaceAll("X", "Х") // Latin 'X' -> Cyrillic 'Х'
-		.replaceAll("I", "І"); // Latin 'I' -> Cyrillic 'І'
+	return text.replace(/[a-zA-Z]/g, (char) => HOMOGLYPH_MAP[char] || char);
 };
 
 type LoginDetails = Parameters<Steam["logOn"]>[0];
