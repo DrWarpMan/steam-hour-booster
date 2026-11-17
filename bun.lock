@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "steam-hour-booster",
@@ -7,7 +8,7 @@
         "p-retry": "^6.2.1",
         "pkg-dir": "^8.0.0",
         "steam-user": "^5.2.3",
-        "zod": "^3.25.30",
+        "zod": "^4.6.7",
       },
       "devDependencies": {
         "@biomejs/biome": "1.9.4",
@@ -169,7 +170,7 @@
 
     "websocket13": ["websocket13@4.0.0", "", { "dependencies": { "@doctormckay/stdlib": "^2.7.1", "bytebuffer": "^5.0.1", "permessage-deflate": "^0.1.7", "tiny-typed-emitter": "^2.1.0", "websocket-extensions": "^0.1.4" } }, "sha512-/ujP9ZfihyAZIXKGxcYpoe7Gj4r5o3WYSfP93o9lVNhhqoBtYba4m1s3mxdjKZu/HOhX5Mcqrt89dv/gC3b06A=="],
 
-    "zod": ["zod@3.25.30", "", {}, "sha512-VolhdEtu6TJr/fzGuHA/SZ5ixvXqA6ADOG9VRcQ3rdOKmF5hkmcJbyaQjUH5BgmpA9gej++zYRX7zjSmdReIwA=="],
+    "zod": ["zod@4.6.7", "", {}, "sha512-g8W2D2kU6a8untc053fX1uVBKzM7yqAxW/3zwk83+6RyF2+SKOuV+c0wBDhUwzV1PaGapmZH+rmcUzPf+3CGwg=="],
 
     "zstddec": ["zstddec@0.1.0", "", {}, "sha512-w2NTI8+3l3eeltKAdK8QpiLo/flRAr2p8AGeakfMZOXBxOg9HIu4LVDxBi81sYgVhFhdJjv1OrB5ssI8uFPoLg=="],
 
